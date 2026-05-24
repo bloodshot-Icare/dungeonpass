@@ -627,7 +627,7 @@ function handleCallback(){
   if(token){
     authToken = token;
     localStorage.setItem('dp_token', token);
-    history.replaceState({}, '', '/');
+    history.replaceState({}, '', location.pathname);
     initUser();
     nav('dashboard');
   }
