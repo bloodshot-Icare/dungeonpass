@@ -315,6 +315,26 @@ footer p{color:var(--textd);font-size:0.8rem;}
 .msg-success{background:rgba(144,192,48,0.1);border:1px solid var(--air2);color:var(--air2);padding:10px 16px;border-radius:4px;font-size:0.88rem;margin-bottom:1rem;display:none;}
 .msg-error{background:rgba(232,64,32,0.1);border:1px solid var(--feu2);color:var(--feu2);padding:10px 16px;border-radius:4px;font-size:0.88rem;margin-bottom:1rem;display:none;}
 
+
+/* ══ RÉSERVATION ══ */
+.resa-box{background:rgba(6,8,24,0.95);border:2px solid var(--rune);border-radius:12px;padding:3rem;max-width:700px;margin:3rem auto 0;position:relative;overflow:hidden;}
+.resa-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rune),#fff,var(--rune2),#fff,var(--rune));}
+.resa-select{width:100%;background:var(--bg3);border:2px solid rgba(96,192,255,0.2);color:var(--text);padding:13px 14px;font-family:'Exo 2',sans-serif;font-size:0.95rem;border-radius:var(--r);outline:none;transition:border-color 0.2s;cursor:pointer;margin-bottom:1rem;}
+.resa-select:focus{border-color:var(--rune);}
+.resa-select option{background:var(--bg3);}
+.resa-preview{background:rgba(30,60,160,0.08);border:1px solid rgba(96,192,255,0.15);border-radius:var(--r);padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:none;}
+.resa-preview.show{display:block;}
+.resa-prix{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--rune2);font-weight:700;}
+.resa-remise{font-size:0.82rem;color:var(--air2);margin-top:4px;}
+.resa-login-msg{text-align:center;padding:2rem;color:var(--textm);}
+.resa-success{background:rgba(60,180,80,0.1);border:2px solid #60C060;border-radius:var(--r);padding:1.5rem;text-align:center;display:none;}
+.resa-success.show{display:block;}
+.resa-success-title{font-family:'Cinzel',serif;font-size:1.2rem;color:#80FF80;margin-bottom:0.5rem;}
+.resa-success-sub{font-size:0.9rem;color:var(--textm);}
+.resa-error{background:rgba(200,40,40,0.1);border:1px solid var(--feu2);border-radius:var(--r);padding:1rem;color:var(--feu2);font-size:0.88rem;margin-bottom:1rem;display:none;}
+.resa-error.show{display:block;}
+.resa-loading{text-align:center;color:var(--textm);padding:1rem;display:none;}
+.resa-loading.show{display:block;}
 /* ══ REVEAL ══ */
 .rv{opacity:0;transform:translateY(25px);transition:all 0.6s ease;}
 .rv.vis{opacity:1;transform:translateY(0);}
@@ -351,6 +371,7 @@ footer p{color:var(--textd);font-size:0.8rem;}
     <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150)">Fidélité</a>
     <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150)">Tarifs</a>
     <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('classement'),150)">Classement</a>
+    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('reserver'),150)" style="color:var(--rune2);">🎫 Réserver</a>
     <a href="#" onclick="nav('dashboard')" id="nav-dash" style="display:none">Mon compte</a>
     <a href="#" onclick="nav('admin')" id="nav-admin" style="display:none;color:var(--or2)">⚙ Admin</a>
   </div>
@@ -466,6 +487,65 @@ footer p{color:var(--textd);font-size:0.8rem;}
       <div class="lblist" id="lbList"></div>
     </div>
     <p style="text-align:center;margin-top:1.2rem;color:var(--textd);font-size:0.85rem;font-family:'Cinzel',serif;">✦ /classement sur Discord pour le top complet ✦</p>
+  </section>
+
+
+  <div class="divider"></div>
+
+  <!-- RÉSERVATION -->
+  <section class="sec" id="reserver">
+    <div class="rv" style="text-align:center;max-width:650px;margin:0 auto;">
+      <div class="stag tag-or">Réservation</div>
+      <h2 class="sh">Réserve ton <span class="a-or">passage depuis le site</span></h2>
+      <p style="color:var(--textm);margin-top:0.8rem;">Connecte-toi avec Discord, choisis ton donjon et le ticket se crée automatiquement sur le serveur.</p>
+    </div>
+    <div class="resa-box rv" id="resaBox">
+
+      <!-- Non connecté -->
+      <div id="resaLoginMsg" class="resa-login-msg" style="display:none;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🔑</div>
+        <p style="margin-bottom:1.5rem;">Connecte-toi avec Discord pour réserver un passage directement depuis le site.</p>
+        <button class="btn-or" onclick="doLogin()">🔑 Se connecter avec Discord</button>
+      </div>
+
+      <!-- Connecté -->
+      <div id="resaForm" style="display:none;">
+        <div id="resaError" class="resa-error"></div>
+        <div id="resaSuccess" class="resa-success">
+          <div class="resa-success-title">🎉 Ticket créé sur Discord !</div>
+          <div class="resa-success-sub" id="resaSuccessMsg"></div>
+        </div>
+        <div id="resaFormInner">
+          <label style="display:block;font-size:0.78rem;color:var(--textm);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Choisir une catégorie</label>
+          <select class="resa-select" id="resaCat" onchange="onCatChange()">
+            <option value="">— Sélectionne une catégorie —</option>
+          </select>
+          <label style="display:block;font-size:0.78rem;color:var(--textm);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Choisir un donjon</label>
+          <select class="resa-select" id="resaDonjon" onchange="onDonjonChange()" disabled>
+            <option value="">— Sélectionne d'abord une catégorie —</option>
+          </select>
+          <div class="resa-preview" id="resaPreview">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+              <div>
+                <div style="font-size:0.8rem;color:var(--textm);margin-bottom:4px;">Prix du passage</div>
+                <div class="resa-prix" id="resaPrix">—</div>
+                <div class="resa-remise" id="resaRemise" style="display:none;">🎁 -50% fidélité appliqué !</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.8rem;color:var(--textm);margin-bottom:4px;">Fidélité</div>
+                <div id="resaFid" style="font-size:0.85rem;color:var(--rune2);">—</div>
+              </div>
+            </div>
+          </div>
+          <div id="resaLoading" class="resa-loading">⏳ Création du ticket en cours...</div>
+          <button class="btn-or" id="resaBtn" onclick="creerTicket()" style="width:100%;justify-content:center;font-size:1rem;padding:14px;" disabled>
+            🎫 Créer le ticket Discord
+          </button>
+          <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--textd);">Le ticket sera créé sur le serveur Discord · Tu recevras une notification</p>
+        </div>
+      </div>
+
+    </div>
   </section>
 
   <!-- CTA -->
@@ -786,7 +866,7 @@ heroEls.forEach((e,i)=>{
 const API='https://bloodshot-icare-dofus-bot-passage-production.up.railway.app';
 let authToken=localStorage.getItem('dp_token'),currentUser=null;
 
-function nav(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');window.scrollTo(0,0);if(page==='dashboard')loadDashboard();if(page==='admin')loadAdmin();closeMobile();}
+function nav(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');window.scrollTo(0,0);if(page==='dashboard')loadDashboard();if(page==='admin')loadAdmin();if(page==='home')initResa();closeMobile();}
 function scrollSec(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},100);}
 function toggleMobile(){document.getElementById('mobileMenu').classList.toggle('open');}
 function closeMobile(){document.getElementById('mobileMenu').classList.remove('open');}
@@ -887,9 +967,124 @@ function showMsg(id,msg,ok){const el=document.getElementById(id);el.textContent=
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 
+
+// ── RÉSERVATION DEPUIS LE SITE ────────────────────────────────────────────────
+let resaCats = [];
+let resaFidelite = null;
+
+async function initResa() {
+  if (!authToken) {
+    document.getElementById('resaLoginMsg').style.display = '';
+    document.getElementById('resaForm').style.display = 'none';
+    return;
+  }
+  document.getElementById('resaLoginMsg').style.display = 'none';
+  document.getElementById('resaForm').style.display = '';
+
+  // Charger les catégories
+  try {
+    resaCats = await apiFetch('/api/categories');
+    const sel = document.getElementById('resaCat');
+    sel.innerHTML = '<option value="">— Sélectionne une catégorie —</option>' +
+      resaCats.map(c => `<option value="${c.id}">${c.emoji} ${c.nom}</option>`).join('');
+  } catch(e) {}
+
+  // Charger la fidélité
+  try {
+    const data = await apiFetch('/api/me');
+    if (data.user) {
+      resaFidelite = data.fidelite;
+      updateResaFid();
+    }
+  } catch(e) {}
+}
+
+function updateResaFid() {
+  if (!resaFidelite) return;
+  const el = document.getElementById('resaFid');
+  if (resaFidelite.estRemise) {
+    el.textContent = '🎁 -50% disponible !';
+    el.style.color = 'var(--or3)';
+  } else {
+    el.textContent = `${resaFidelite.passagesRestants} passage(s) pour le -50%`;
+    el.style.color = 'var(--rune2)';
+  }
+}
+
+function onCatChange() {
+  const catId = parseInt(document.getElementById('resaCat').value);
+  const donjonSel = document.getElementById('resaDonjon');
+  document.getElementById('resaPreview').classList.remove('show');
+  document.getElementById('resaBtn').disabled = true;
+  donjonSel.disabled = true;
+  donjonSel.innerHTML = '<option value="">— Sélectionne un donjon —</option>';
+  if (!catId) return;
+
+  const cat = resaCats.find(c => c.id === catId);
+  if (!cat) return;
+  donjonSel.innerHTML = '<option value="">— Sélectionne un donjon —</option>' +
+    cat.donjons.map(d => {
+      const prix = d.prix > 0 ? fmtK(d.prix) : 'Prix à définir';
+      const remise = resaFidelite?.estRemise && d.prix > 0 ? ` → ${fmtK(Math.floor(d.prix*0.5))} (-50%)` : '';
+      return `<option value="${d.id}" data-prix="${d.prix}">${d.nom} — ${prix}${remise}</option>`;
+    }).join('');
+  donjonSel.disabled = false;
+}
+
+function onDonjonChange() {
+  const sel = document.getElementById('resaDonjon');
+  const opt = sel.options[sel.selectedIndex];
+  const preview = document.getElementById('resaPreview');
+  const btn = document.getElementById('resaBtn');
+
+  if (!sel.value) { preview.classList.remove('show'); btn.disabled = true; return; }
+
+  const prix = parseInt(opt.dataset.prix) || 0;
+  const estRemise = resaFidelite?.estRemise && prix > 0;
+  const prixFinal = estRemise ? Math.floor(prix * 0.5) : prix;
+
+  document.getElementById('resaPrix').textContent = prix > 0 ? fmtK(prixFinal) : 'Prix à définir';
+  const remiseEl = document.getElementById('resaRemise');
+  if (estRemise) { remiseEl.style.display = ''; remiseEl.textContent = `🎁 -50% fidélité ! (au lieu de ${fmtK(prix)})`; }
+  else { remiseEl.style.display = 'none'; }
+
+  preview.classList.add('show');
+  btn.disabled = false;
+}
+
+async function creerTicket() {
+  const donjonId = document.getElementById('resaDonjon').value;
+  if (!donjonId) return;
+
+  const errEl = document.getElementById('resaError');
+  const loadEl = document.getElementById('resaLoading');
+  const btn = document.getElementById('resaBtn');
+  const successEl = document.getElementById('resaSuccess');
+  const formInner = document.getElementById('resaFormInner');
+
+  errEl.classList.remove('show');
+  loadEl.classList.add('show');
+  btn.disabled = true;
+
+  try {
+    const res = await apiFetch('/api/ticket/create', { method: 'POST', body: JSON.stringify({ donjon_id: parseInt(donjonId) }) });
+    loadEl.classList.remove('show');
+    formInner.style.display = 'none';
+    successEl.classList.add('show');
+    document.getElementById('resaSuccessMsg').textContent =
+      `Le salon #${res.channel} a été créé sur Discord. Rejoins le serveur pour voir ton ticket !`;
+  } catch(e) {
+    loadEl.classList.remove('show');
+    btn.disabled = false;
+    errEl.textContent = '❌ ' + (e.error || 'Erreur lors de la création du ticket');
+    errEl.classList.add('show');
+  }
+}
+
 if(location.search.includes('token=')||location.search.includes('error='))handleCallback();
 initUser();
 loadHome();
+setTimeout(initResa, 500);
 </script>
 </body>
 </html>
