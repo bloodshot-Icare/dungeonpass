@@ -348,9 +348,9 @@ footer p{color:var(--textd);font-size:0.8rem;}
   <div class="nav-logo" onclick="nav('home')">⚔ DungeonPass</div>
   <div class="nav-center">
     
-    <a href="#" onclick="scrollSec('fidelite')">Fidélité</a>
-    <a href="#" onclick="scrollSec('prix')">Tarifs</a>
-    <a href="#" onclick="scrollSec('classement')">Classement</a>
+    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150)">Fidélité</a>
+    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150)">Tarifs</a>
+    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('classement'),150)">Classement</a>
     <a href="#" onclick="nav('dashboard')" id="nav-dash" style="display:none">Mon compte</a>
     <a href="#" onclick="nav('admin')" id="nav-admin" style="display:none;color:var(--or2)">⚙ Admin</a>
   </div>
