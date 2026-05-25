@@ -877,34 +877,6 @@ function showMsg(id,msg,ok){const el=document.getElementById(id);el.textContent=
 
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
-  async function creerTicket() {
-  const donjonId = document.getElementById('resaDonjon').value;
-  if (!donjonId) return;
- 
-  const errEl = document.getElementById('resaError');
-  const loadEl = document.getElementById('resaLoading');
-  const btn = document.getElementById('resaBtn');
-  const successEl = document.getElementById('resaSuccess');
-  const formInner = document.getElementById('resaFormInner');
- 
-  errEl.classList.remove('show');
-  loadEl.classList.add('show');
-  btn.disabled = true;
- 
-  try {
-    const res = await apiFetch('/api/ticket/create', { method: 'POST', body: JSON.stringify({ donjon_id: parseInt(donjonId) }) });
-    loadEl.classList.remove('show');
-    formInner.style.display = 'none';
-    successEl.classList.add('show');
-    document.getElementById('resaSuccessMsg').textContent =
-      `Le salon #${res.channel} a été créé sur Discord. Rejoins le serveur pour voir ton ticket !`;
-  } catch(e) {
-    loadEl.classList.remove('show');
-    btn.disabled = false;
-    errEl.textContent = '❌ ' + (e.error || 'Erreur lors de la création du ticket');
-    errEl.classList.add('show');
-  }
-}
 
 if(location.search.includes('token=')||location.search.includes('error='))handleCallback();
 initUser();
