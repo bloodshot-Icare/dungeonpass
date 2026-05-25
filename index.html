@@ -228,7 +228,9 @@ h1.htitle{font-family:'Cinzel Decorative',serif;font-size:clamp(2.2rem,6vw,5rem)
 .lbi{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid rgba(255,255,255,0.04);border-radius:4px;padding:0.85rem 1.3rem;transition:border-color 0.2s;}
 .lbi:hover{border-color:rgba(232,160,32,0.25);}
 .lbpos{font-family:'Cinzel',serif;font-size:0.9rem;color:var(--textd);width:24px;text-align:center;font-weight:700;}
-.lbnm{flex:1;font-weight:600;font-size:0.9rem;color:var(--text);}
+.lbnm{flex:1;font-weight:600;font-size:0.9rem;color:var(--text);display:flex;flex-direction:column;gap:2px;}
+.lbi-rang{font-size:0.72rem;color:var(--or2);font-family:'Cinzel',serif;font-weight:400;letter-spacing:0.04em;}
+.lb-rang{font-size:0.72rem;color:var(--or2);font-family:'Cinzel',serif;letter-spacing:0.04em;margin-bottom:4px;min-height:1em;}
 .lbcnt{font-family:'Cinzel',serif;color:var(--or2);font-size:0.9rem;}
 .lbbar{width:90px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
 .lbbar-f{height:100%;background:linear-gradient(90deg,var(--or),var(--rune2));border-radius:2px;}
@@ -503,9 +505,9 @@ nav,footer,.cc,.fstep,.kamas-box,.resa-box,.cta-box,.pc,.lbi,.ds-card,.dash-prof
     </div>
     <div class="rv">
       <div class="lb-pod">
-        <div class="pc r2"><span class="pmed">🥈</span><div class="prnk">2ème</div><div class="pnm2" id="lb2n">—</div><div class="pnum" id="lb2c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb2b" style="width:0%"></div></div></div>
-        <div class="pc r1"><span class="pmed">🥇</span><div class="prnk">Champion</div><div class="pnm2" id="lb1n">—</div><div class="pnum" id="lb1c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb1b" style="width:0%"></div></div></div>
-        <div class="pc r3"><span class="pmed">🥉</span><div class="prnk">3ème</div><div class="pnm2" id="lb3n">—</div><div class="pnum" id="lb3c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb3b" style="width:0%"></div></div></div>
+        <div class="pc r2"><span class="pmed">🥈</span><div class="prnk">2ème</div><div class="pnm2" id="lb2n">—</div><div class="lb-rang" id="lb2r"></div><div class="pnum" id="lb2c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb2b" style="width:0%"></div></div></div>
+        <div class="pc r1"><span class="pmed">🥇</span><div class="prnk">Champion</div><div class="pnm2" id="lb1n">—</div><div class="lb-rang" id="lb1r"></div><div class="pnum" id="lb1c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb1b" style="width:0%"></div></div></div>
+        <div class="pc r3"><span class="pmed">🥉</span><div class="prnk">3ème</div><div class="pnm2" id="lb3n">—</div><div class="lb-rang" id="lb3r"></div><div class="pnum" id="lb3c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb3b" style="width:0%"></div></div></div>
       </div>
       <div class="lblist" id="lbList"></div>
     </div>
@@ -912,8 +914,8 @@ async function loadHome(){
   try{const s=await apiFetch('/api/stats');animCount(document.getElementById('sp'),s.totalPassages);animCount(document.getElementById('sj'),s.totalJoueurs);}catch(e){}
   try{
     const lb=await apiFetch('/api/leaderboard'),top3=lb.slice(0,3),order=[top3[1],top3[0],top3[2]],ids=['lb2','lb1','lb3'],max=top3[0]?.total_passages||1;
-    order.forEach((u,i)=>{if(!u)return;document.getElementById(ids[i]+'n').textContent=u.username;document.getElementById(ids[i]+'c').textContent=u.total_passages;setTimeout(()=>{document.getElementById(ids[i]+'b').style.width=Math.round(u.total_passages/max*100)+'%';},500);});
-    document.getElementById('lbList').innerHTML=lb.slice(3).map((u,i)=>`<div class="lbi"><div class="lbpos">${i+4}</div><div class="lbnm">${u.username}</div><div class="lbcnt">${u.total_passages}</div><div class="lbbar"><div class="lbbar-f" style="width:${Math.round(u.total_passages/max*100)}%"></div></div></div>`).join('');
+    order.forEach((u,i)=>{if(!u)return;document.getElementById(ids[i]+'n').textContent=u.username;document.getElementById(ids[i]+'c').textContent=u.total_passages;const rEl=document.getElementById(ids[i]+'r');if(rEl&&u.rang)rEl.textContent='🏅 '+u.rang.nom;setTimeout(()=>{document.getElementById(ids[i]+'b').style.width=Math.round(u.total_passages/max*100)+'%';},500);});
+    document.getElementById('lbList').innerHTML=lb.slice(3).map((u,i)=>`<div class="lbi"><div class="lbpos">${i+4}</div><div class="lbnm">${u.username}${u.rang?`<span class="lbi-rang">${u.rang.nom}</span>`:''}</div><div class="lbcnt">${u.total_passages}</div><div class="lbbar"><div class="lbbar-f" style="width:${Math.round(u.total_passages/max*100)}%"></div></div></div>`).join('');
   }catch(e){}
   try{
     const cats=await apiFetch('/api/categories');
@@ -930,6 +932,7 @@ async function loadDashboard(){
     const data=await apiFetch('/api/me');if(!data.user)return;const u=data.user;
     document.getElementById('dash-avatar').src=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=128`:`https://cdn.discordapp.com/embed/avatars/0.png`;
     document.getElementById('dash-name').textContent=u.username;
+    document.querySelector('.dash-tag').textContent=u.rang?'🏅 '+u.rang.nom:'Aventurier DungeonPass';
     document.getElementById('ds-total').textContent=u.total_passages;
     document.getElementById('ds-remises').textContent=u.remises_utilisees;
     const f=data.fidelite,pos=u.total_passages%(data.passages_avant_remise+1);
