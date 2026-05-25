@@ -377,9 +377,10 @@ footer p{color:var(--textd);font-size:0.8rem;}
   </div>
   <div class="nav-right">
     <a href="https://discord.gg/ktXZf6XskG" class="btn-discord" target="_blank">💬 Discord</a>
-    <div id="nav-user" style="display:none" class="user-avatar" onclick="nav('dashboard')">
-      <img id="nav-avatar" src="" alt="">
-      <div><div class="uname" id="nav-uname"></div><div class="admin-badge" id="nav-admin-badge" style="display:none">Admin</div></div>
+    <div id="nav-user" style="display:none" class="user-avatar">
+      <img id="nav-avatar" src="" alt="" onclick="nav('dashboard')" style="cursor:pointer;">
+      <div onclick="nav('dashboard')" style="cursor:pointer;"><div class="uname" id="nav-uname"></div><div class="admin-badge" id="nav-admin-badge" style="display:none">Admin</div></div>
+      <button onclick="logout()" style="background:rgba(232,64,32,0.15);border:1px solid var(--feu);color:var(--feu2);padding:4px 10px;border-radius:4px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;margin-left:4px;">✕</button>
     </div>
     <button class="btn-login" id="nav-login" onclick="doLogin()">🔑 Connexion</button>
     <div class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></div>
