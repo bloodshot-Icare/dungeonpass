@@ -1,84 +1,886 @@
-require('dotenv').config({ override: false });
-const { Client, GatewayIntentBits, Collection, Events } = require('discord.js');
-const fs = require('fs');
-const path = require('path');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DungeonPass — Passages Donjon Dofus</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#E8A020;--or2:#F5C040;--or3:#FFD970;
+  --feu:#E84020;--feu2:#FF6040;
+  --eau:#2080D0;--eau2:#40A8F0;
+  --rune:#60C0FF;--rune2:#A0DFFF;--rune3:#C8EEFF;
+  --eclair:#FFFFFF;--eclair2:#B0D8FF;
+  --air:#90C030;--air2:#B8E050;
+  --terre:#8B5020;--terre2:#C07840;
+  --bg:#04040C;--bg2:#080818;--bg3:#0C1024;--bg4:#101430;--bg5:#14183C;
+  --card:#0A0A20;--card2:#0E1028;
+  --text:#E8F0FF;--textm:#7080A8;--textd:#3A4060;
+  --border:rgba(96,192,255,0.2);--border2:rgba(96,192,255,0.4);
+  --r:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;background-image:radial-gradient(ellipse 120% 80% at 50% 100%,rgba(20,30,100,0.5) 0%,transparent 60%);}
 
-// Démarrer l'API Express en parallèle
-const apiApp = require('./api');
+/* ══ CANVAS ══ */
+#mc{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
-});
+/* ══ NAV ══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(4,4,14,0.96);border-bottom:2px solid var(--rune);box-shadow:0 2px 20px rgba(60,120,255,0.2);}
+.nav-logo{font-family:'Cinzel Decorative',serif;font-size:1.15rem;font-weight:900;color:var(--rune2);cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:0.05em;text-shadow:0 0 15px rgba(96,192,255,0.5);}
+.nav-center{display:flex;gap:2rem;}
+.nav-center a{color:var(--textm);text-decoration:none;font-weight:600;font-size:0.83rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;font-family:'Cinzel',serif;}
+.nav-center a:hover{color:var(--rune2);}
+.nav-right{display:flex;align-items:center;gap:0.8rem;}
+.btn-discord{display:flex;align-items:center;gap:7px;background:#5865F2;color:#fff;padding:8px 16px;font-family:'Exo 2',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border-radius:4px;transition:background 0.2s;border:none;cursor:pointer;white-space:nowrap;}
+.btn-discord:hover{background:#4752C4;}
+.btn-login{display:flex;align-items:center;gap:7px;background:rgba(60,120,255,0.08);border:2px solid var(--rune);color:var(--rune2);padding:7px 16px;font-family:'Exo 2',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:0.06em;text-transform:uppercase;border-radius:4px;transition:all 0.2s;cursor:pointer;box-shadow:0 0 10px rgba(96,192,255,0.15);}
+.btn-login:hover{background:rgba(60,120,255,0.18);box-shadow:0 0 20px rgba(96,192,255,0.3);}
+.user-avatar{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 10px;border-radius:4px;border:1px solid transparent;transition:border-color 0.2s;}
+.user-avatar:hover{border-color:var(--or);}
+.user-avatar img{width:32px;height:32px;border-radius:50%;border:2px solid var(--or);}
+.uname{font-size:0.85rem;font-weight:600;color:var(--text);}
+.admin-badge{background:var(--or2);color:#000;font-size:0.62rem;font-weight:700;padding:1px 7px;border-radius:20px;text-transform:uppercase;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--textm);border-radius:2px;}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(10,10,15,0.98);z-index:190;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{color:var(--or3);text-decoration:none;font-size:1.5rem;font-family:'Cinzel',serif;font-weight:700;}
 
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
+/* ══ PAGES ══ */
+.page{display:none;min-height:100vh;padding-top:68px;position:relative;z-index:1;}
+.page.active{display:block;}
 
-for (const file of commandFiles) {
-  const command = require(path.join(commandsPath, file));
-  if (command.data && command.execute) {
-    client.commands.set(command.data.name, command);
-    console.log(`✅ Commande chargée : /${command.data.name}`);
+/* ══ HERO ══ */
+.hero{min-height:calc(100vh - 68px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem 5rem;position:relative;}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 60%,rgba(30,60,180,0.25) 0%,rgba(80,20,160,0.12) 40%,transparent 70%);pointer-events:none;}
+
+/* Éléments Dofus volants */
+.el-icons{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.el-icon{position:absolute;font-size:1.8rem;opacity:0;animation:elFloat linear infinite;}
+@keyframes elFloat{
+  0%{opacity:0;transform:translateY(110vh) rotate(0deg);}
+  10%{opacity:0.18;}
+  80%{opacity:0.12;}
+  100%{opacity:0;transform:translateY(-80px) rotate(720deg);}
+}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:12px;background:rgba(60,120,255,0.08);border:1px solid rgba(96,192,255,0.4);color:var(--rune2);padding:6px 20px;font-size:0.75rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;border-radius:3px;margin-bottom:2.5rem;box-shadow:0 0 20px rgba(96,192,255,0.15);}
+h1.htitle{font-family:'Cinzel Decorative',serif;font-size:clamp(2.2rem,6vw,5rem);font-weight:900;line-height:1.08;margin-bottom:1rem;}
+.ht1{display:block;color:var(--rune3);text-shadow:0 0 40px rgba(96,192,255,0.6),0 0 80px rgba(40,80,255,0.3);}
+.ht2{display:block;font-size:0.42em;color:var(--rune);font-family:'Cinzel',serif;font-weight:700;letter-spacing:0.15em;margin-top:0.5em;}
+.hero-sub{font-size:1.05rem;color:var(--textm);max-width:560px;line-height:1.9;margin:1.2rem auto 3rem;font-weight:300;}
+.hero-sub strong{color:var(--rune2);font-weight:700;}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+.btn-or{background:linear-gradient(135deg,rgba(30,80,200,0.9),rgba(60,30,160,0.9));color:#fff;padding:13px 32px;font-family:'Exo 2',sans-serif;font-weight:700;font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:4px;transition:all 0.2s;border:1px solid var(--rune);cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 25px rgba(60,120,255,0.35);}
+.btn-or:hover{background:linear-gradient(135deg,rgba(50,110,230,0.9),rgba(80,40,200,0.9));box-shadow:0 0 35px rgba(60,120,255,0.55);}
+.btn-outline{background:transparent;color:var(--rune2);border:2px solid var(--rune);padding:11px 30px;font-family:'Exo 2',sans-serif;font-weight:700;font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;transition:all 0.2s;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.btn-outline:hover{background:rgba(60,120,255,0.12);}
+
+/* ══ STATS ══ */
+.statsbar{background:rgba(6,8,20,0.95);border-top:1px solid rgba(96,192,255,0.3);border-bottom:1px solid rgba(96,192,255,0.3);position:relative;z-index:1;}
+.stats-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.stat{padding:1.8rem 1rem;text-align:center;border-right:1px solid rgba(232,160,32,0.1);transition:background 0.2s;}
+.stat:last-child{border-right:none;}
+.stat:hover{background:var(--bg3);}
+.snum{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;display:block;line-height:1;}
+.sg{color:var(--or3);}
+.se{color:var(--eau2);}
+.sa{color:var(--air2);}
+.sf{color:var(--feu2);}
+.slabel{font-size:0.72rem;color:var(--textd);text-transform:uppercase;letter-spacing:0.12em;margin-top:6px;display:block;}
+
+/* ══ SECTION ══ */
+.sec{padding:6rem 1.5rem;max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+.stag{display:inline-flex;align-items:center;gap:10px;font-size:0.72rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin-bottom:1rem;}
+.stag::before,.stag::after{content:'';display:block;width:28px;height:1px;}
+.tag-or{color:var(--rune2);}.tag-or::before,.tag-or::after{background:var(--rune2);}
+.tag-feu{color:var(--rune2);}.tag-feu::before,.tag-feu::after{background:var(--rune2);}
+.tag-eau{color:var(--rune2);}.tag-eau::before,.tag-eau::after{background:var(--rune2);}
+.tag-air{color:var(--rune2);}.tag-air::before,.tag-air::after{background:var(--rune2);}
+.sh{font-family:'Cinzel',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:var(--text);line-height:1.2;margin-bottom:0.8rem;}
+.a-or{color:var(--rune2);text-shadow:0 0 20px rgba(96,192,255,0.4);}
+.a-feu{color:var(--rune2);}
+.a-eau{color:var(--rune2);}
+.a-vi{color:#B080FF;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--rune),rgba(120,60,255,0.6),var(--rune),transparent);position:relative;z-index:1;opacity:0.5;}
+
+/* ══ CLASSES DOFUS ══ */
+.classes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1rem;margin-top:3rem;}
+.classe-card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:var(--r);padding:1.2rem 0.8rem;transition:all 0.25s;cursor:default;position:relative;overflow:hidden;text-align:center;}
+.classe-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.classe-card.feu::before{background:linear-gradient(90deg,#FF4020,#FF8060);}
+.classe-card.eau::before{background:linear-gradient(90deg,#2060C0,var(--rune));}
+.classe-card.air::before{background:linear-gradient(90deg,var(--air),var(--air2));}
+.classe-card.terre::before{background:linear-gradient(90deg,var(--terre),var(--terre2));}
+.classe-card.multi::before{background:linear-gradient(90deg,#FF4020,var(--rune),#80C030);}
+.classe-card:hover{transform:translateY(-3px);border-color:rgba(232,160,32,0.3);}
+.classe-icon{font-size:2.2rem;display:block;margin-bottom:0.5rem;}
+.classe-name{font-family:'Cinzel',serif;font-size:0.78rem;font-weight:700;color:var(--text);display:block;}
+.classe-elem{font-size:0.68rem;color:var(--textd);margin-top:2px;display:block;}
+.elem-feu{color:var(--feu2);}
+.elem-eau{color:var(--eau2);}
+.elem-air{color:var(--air2);}
+.elem-terre{color:var(--terre2);}
+.elem-multi{background:linear-gradient(90deg,var(--feu2),var(--air2),var(--eau2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ══ ÉLÉMENTS LEGEND ══ */
+.elem-legend{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:2rem;}
+.elem-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid;}
+.ep-feu{background:rgba(232,64,32,0.12);border-color:var(--feu2);color:var(--feu2);}
+.ep-eau{background:rgba(32,128,208,0.12);border-color:var(--eau2);color:var(--eau2);}
+.ep-air{background:rgba(144,192,48,0.12);border-color:var(--air2);color:var(--air2);}
+.ep-terre{background:rgba(139,80,32,0.12);border-color:var(--terre2);color:var(--terre2);}
+
+/* ══ FIDÉLITÉ ══ */
+.fid-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;margin-top:3.5rem;}
+.fid-steps{display:flex;flex-direction:column;gap:1rem;}
+.fstep{display:flex;gap:1.3rem;align-items:flex-start;padding:1.2rem 1.4rem;background:rgba(8,10,28,0.8);border:1px solid rgba(96,192,255,0.1);border-radius:var(--r);transition:border-color 0.2s;}
+.fstep:hover{border-color:rgba(96,192,255,0.35);}
+.fstep.sp{border-color:var(--rune);background:rgba(60,120,255,0.06);box-shadow:0 0 15px rgba(60,120,255,0.1);}
+.fstep-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;font-weight:700;font-family:'Cinzel',serif;border:2px solid;}
+.ic1{background:rgba(32,128,208,0.15);border-color:var(--eau2);color:var(--eau2);}
+.ic2{background:rgba(232,64,32,0.15);border-color:var(--feu2);color:var(--feu2);}
+.ic3{background:rgba(144,192,48,0.15);border-color:var(--air2);color:var(--air2);}
+.ic4{background:rgba(232,160,32,0.15);border-color:var(--or2);color:var(--or3);}
+.fstep-t{font-weight:700;font-size:0.95rem;margin-bottom:2px;color:var(--text);}
+.fstep-d{font-size:0.85rem;color:var(--textm);}
+.fid-visual{display:flex;flex-direction:column;align-items:center;gap:2rem;}
+.kamas-box{background:rgba(6,8,24,0.9);border:2px solid var(--rune);border-radius:12px;padding:2.5rem 2rem;text-align:center;width:100%;max-width:280px;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(60,120,255,0.2),inset 0 0 40px rgba(20,40,120,0.3);}
+.kamas-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rune),#fff,var(--rune2),#fff,var(--rune));}
+.kb-icon{font-size:3.5rem;display:block;margin-bottom:0.6rem;}
+.kb-pct{font-family:'Cinzel Decorative',serif;font-size:4.5rem;font-weight:900;color:var(--rune3);line-height:1;text-shadow:0 0 30px rgba(96,192,255,0.7),0 0 60px rgba(60,120,255,0.4);}
+.kb-sub{font-size:0.82rem;color:var(--textm);text-transform:uppercase;letter-spacing:0.12em;margin-top:6px;}
+.kb-det{font-size:0.78rem;color:var(--textd);margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(232,160,32,0.15);}
+.cycle{display:flex;align-items:center;gap:0.7rem;margin-top:1.5rem;}
+.cy{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Cinzel',serif;border:2px solid;font-size:0.9rem;}
+.cy.n{background:rgba(32,128,208,0.12);border-color:var(--eau2);color:var(--eau2);}
+.cy.g{background:rgba(232,160,32,0.12);border-color:var(--or2);color:var(--or3);font-size:1.2rem;}
+.cy-arr{color:var(--textd);font-size:0.75rem;}
+
+/* ══ PRIX ══ */
+.prix-wrap{background:var(--bg2);border-top:1px solid rgba(232,160,32,0.15);border-bottom:1px solid rgba(232,160,32,0.15);padding:6rem 0;position:relative;z-index:1;}
+.psrch-wrap{position:relative;max-width:520px;margin:2.5rem auto;}
+.psrch-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--textd);pointer-events:none;}
+.psrch{width:100%;background:var(--card2);border:2px solid rgba(232,160,32,0.2);color:var(--text);padding:13px 14px 13px 42px;font-family:'Exo 2',sans-serif;font-size:0.95rem;border-radius:var(--r);outline:none;transition:border-color 0.2s;}
+.psrch:focus{border-color:var(--or);}
+.psrch::placeholder{color:var(--textd);}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;}
+.cc{background:rgba(8,10,28,0.9);border:1px solid rgba(96,192,255,0.12);border-radius:var(--r);overflow:hidden;transition:border-color 0.2s;}
+.cc:hover{border-color:rgba(96,192,255,0.4);box-shadow:0 0 15px rgba(60,100,255,0.1);}
+.ch{display:flex;align-items:center;gap:12px;padding:1rem 1.3rem;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:background 0.15s;}
+.ch:hover{background:rgba(232,160,32,0.04);}
+.cc.open .ch{border-bottom-color:rgba(232,160,32,0.12);}
+.cemo{font-size:1.5rem;width:34px;text-align:center;}
+.ctit{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;color:var(--text);flex:1;}
+.cbdg{font-size:0.7rem;background:rgba(60,120,255,0.1);border:1px solid rgba(96,192,255,0.3);color:var(--rune2);padding:2px 9px;border-radius:20px;white-space:nowrap;}
+.cchv{color:var(--textd);font-size:0.75rem;transition:transform 0.25s;}
+.cc.open .cchv{transform:rotate(180deg);}
+.cbody{display:none;}
+.cc.open .cbody{display:block;}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:0.72rem 1.3rem;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.12s;}
+.prow:last-child{border-bottom:none;}
+.prow:hover{background:rgba(232,160,32,0.04);}
+.pname{font-size:0.88rem;font-weight:600;color:var(--text);}
+.pval{font-family:'Cinzel',serif;font-size:0.88rem;color:var(--rune2);white-space:nowrap;}
+.ptbd{color:var(--textd);font-family:'Exo 2',sans-serif;font-size:0.8rem;font-style:italic;}
+.prow.boss .pname::after{content:' 👑';font-size:0.75rem;}
+
+/* ══ CLASSEMENT ══ */
+.lb-pod{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:1.2rem;margin:3rem 0 1.5rem;align-items:end;}
+.pc{background:rgba(8,10,28,0.9);border-radius:var(--r);padding:2rem 1.2rem;text-align:center;border:1px solid rgba(96,192,255,0.1);position:relative;overflow:hidden;}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.pc.r1{border-color:rgba(96,192,255,0.4);box-shadow:0 0 25px rgba(60,120,255,0.12);}
+.pc.r1::before{background:linear-gradient(90deg,var(--or),var(--or3),var(--or));}
+.pc.r2::before{background:linear-gradient(90deg,#666,#ccc,#666);}
+.pc.r3::before{background:linear-gradient(90deg,#7A4A20,#C07840,#7A4A20);}
+.pmed{font-size:2.5rem;display:block;margin-bottom:0.5rem;}
+.prnk{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--textd);margin-bottom:4px;}
+.pnm2{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.pnum{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;}
+.r1 .pnum{color:var(--rune2);text-shadow:0 0 15px rgba(96,192,255,0.5);}
+.r2 .pnum{color:#bbb;}
+.r3 .pnum{color:#C07840;}
+.plbl{font-size:0.7rem;color:var(--textd);text-transform:uppercase;letter-spacing:0.08em;}
+.pbar{height:3px;background:var(--bg4);border-radius:2px;margin-top:1rem;overflow:hidden;}
+.pbar-f{height:100%;border-radius:2px;transition:width 1.5s ease;}
+.r1 .pbar-f{background:linear-gradient(90deg,var(--rune),#fff,var(--rune2));}
+.r2 .pbar-f{background:#999;}
+.r3 .pbar-f{background:#C07840;}
+.lblist{display:flex;flex-direction:column;gap:0.5rem;}
+.lbi{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid rgba(255,255,255,0.04);border-radius:4px;padding:0.85rem 1.3rem;transition:border-color 0.2s;}
+.lbi:hover{border-color:rgba(232,160,32,0.25);}
+.lbpos{font-family:'Cinzel',serif;font-size:0.9rem;color:var(--textd);width:24px;text-align:center;font-weight:700;}
+.lbnm{flex:1;font-weight:600;font-size:0.9rem;color:var(--text);}
+.lbcnt{font-family:'Cinzel',serif;color:var(--rune2);font-size:0.9rem;}
+.lbbar{width:90px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.lbbar-f{height:100%;background:linear-gradient(90deg,var(--eau2),var(--rune2));border-radius:2px;}
+
+/* ══ CTA ══ */
+.cta-sec{padding:6rem 1.5rem;position:relative;z-index:1;}
+.cta-box{max-width:880px;margin:0 auto;background:rgba(6,8,24,0.95);border:2px solid var(--rune);border-radius:12px;padding:4.5rem 2.5rem;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(40,80,255,0.15);}
+.cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--feu),var(--or2),var(--or3),var(--eau2),var(--air2),var(--violet,#9060FF));}
+.cta-elem{display:flex;justify-content:center;gap:1.2rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.cta-elem-pill{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid;}
+.cep-feu{background:rgba(232,64,32,0.12);border-color:var(--feu2);color:var(--feu2);}
+.cep-eau{background:rgba(32,128,208,0.12);border-color:var(--eau2);color:var(--eau2);}
+.cep-air{background:rgba(144,192,48,0.12);border-color:var(--air2);color:var(--air2);}
+.cep-terre{background:rgba(139,80,32,0.12);border-color:var(--terre2);color:var(--terre2);}
+.cta-t{font-family:'Cinzel',serif;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--rune2);margin-bottom:0.8rem;text-shadow:0 0 20px rgba(96,192,255,0.4);}
+.cta-s{color:var(--textm);max-width:460px;margin:0 auto 2rem;line-height:1.8;font-size:0.95rem;}
+.cta-feats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.cfeat{font-size:0.83rem;color:var(--textm);}
+.cfeat::before{content:'✦ ';color:var(--or2);}
+
+/* ══ FOOTER ══ */
+footer{background:rgba(4,4,14,0.98);border-top:2px solid var(--rune);padding:2.5rem 1.5rem;text-align:center;position:relative;z-index:1;box-shadow:0 -5px 30px rgba(40,80,255,0.1);}
+.flogo{font-family:'Cinzel Decorative',serif;font-size:1.1rem;font-weight:900;color:var(--rune2);margin-bottom:0.5rem;text-shadow:0 0 15px rgba(96,192,255,0.4);}
+.felem{display:flex;justify-content:center;gap:0.8rem;margin-bottom:0.8rem;}
+.fep{padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;border:1px solid;}
+footer p{color:var(--textd);font-size:0.8rem;}
+
+/* ══ DASHBOARD ══ */
+.dash-grid{display:grid;grid-template-columns:300px 1fr;gap:2rem;margin-top:3rem;}
+.dash-profile{background:rgba(8,10,28,0.9);border:2px solid rgba(96,192,255,0.2);border-radius:var(--r);padding:2rem;display:flex;flex-direction:column;align-items:center;gap:1.2rem;}
+.dash-avatar{width:80px;height:80px;border-radius:50%;border:3px solid var(--rune);box-shadow:0 0 15px rgba(96,192,255,0.3);}
+.dash-name{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:var(--text);text-align:center;}
+.dash-tag{font-size:0.75rem;color:var(--textd);}
+.progress-ring{position:relative;width:140px;height:140px;margin:0.5rem auto;}
+.progress-ring svg{transform:rotate(-90deg);}
+.ring-bg{stroke:var(--bg4);fill:none;stroke-width:8;}
+.ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease;}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.ring-num{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;color:var(--or3);line-height:1;}
+.ring-sub{font-size:0.72rem;color:var(--textd);margin-top:2px;}
+.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;width:100%;}
+.ds-card{background:var(--bg3);border-radius:4px;padding:0.9rem;text-align:center;border:1px solid rgba(232,160,32,0.08);}
+.ds-num{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;display:block;}
+.ds-lbl{font-size:0.72rem;color:var(--textd);text-transform:uppercase;letter-spacing:0.08em;}
+.dash-main{display:flex;flex-direction:column;gap:1.5rem;}
+.dash-card{background:rgba(8,10,28,0.9);border:1px solid rgba(96,192,255,0.12);border-radius:var(--r);overflow:hidden;}
+.dash-card-head{padding:1rem 1.4rem;border-bottom:1px solid rgba(96,192,255,0.1);background:rgba(30,60,160,0.08);}
+.dash-card-title{font-family:'Cinzel',serif;font-size:0.95rem;font-weight:700;color:var(--rune2);}
+.dash-card-body{padding:1.4rem;}
+.remise-banner{background:rgba(232,160,32,0.08);border:2px solid var(--or);border-radius:var(--r);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1rem;}
+.remise-ico{font-size:2rem;}
+.remise-t{font-weight:700;color:var(--or3);font-size:1rem;}
+.remise-s{font-size:0.83rem;color:var(--textm);}
+.fid-progress{display:flex;flex-direction:column;gap:0.6rem;}
+.fid-dots{display:flex;gap:0.6rem;align-items:center;}
+.fdot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;font-family:'Cinzel',serif;border:2px solid;}
+.fdot.done{background:rgba(144,192,48,0.15);border-color:var(--air2);color:var(--air2);}
+.fdot.current{background:rgba(232,160,32,0.1);border-color:var(--or);color:var(--or3);}
+.fdot.empty{background:var(--bg3);border-color:var(--textd);color:var(--textd);}
+.fdot.gift{background:rgba(232,160,32,0.12);border-color:var(--or);color:var(--or3);font-size:1rem;}
+.fid-label{font-size:0.82rem;color:var(--textm);}
+.hist-list{display:flex;flex-direction:column;gap:0.5rem;}
+.hist-item{display:flex;align-items:center;gap:0.8rem;padding:0.7rem;background:var(--bg3);border-radius:4px;font-size:0.85rem;border:1px solid rgba(232,160,32,0.06);}
+.hist-badge{padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;white-space:nowrap;}
+.hb-remise{background:rgba(232,160,32,0.12);color:var(--or3);border:1px solid var(--or);}
+.hb-normal{background:rgba(32,128,208,0.12);color:var(--eau2);border:1px solid var(--eau);}
+.hist-don{flex:1;font-weight:500;}
+.hist-prix{font-family:'Cinzel',serif;font-size:0.85rem;color:var(--rune2);}
+.hist-date{font-size:0.74rem;color:var(--textd);}
+
+/* ══ ADMIN ══ */
+.admin-tabs{display:flex;gap:0.5rem;margin-bottom:2rem;flex-wrap:wrap;}
+.atab{padding:8px 20px;background:var(--card);border:1px solid rgba(232,160,32,0.15);border-radius:4px;color:var(--textm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Exo 2',sans-serif;}
+.atab:hover,.atab.active{background:rgba(232,160,32,0.1);border-color:var(--or);color:var(--or2);}
+.admin-panel{display:none;}
+.admin-panel.active{display:block;}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{padding:0.7rem 1rem;background:var(--bg3);text-align:left;font-size:0.78rem;color:var(--textm);text-transform:uppercase;letter-spacing:0.1em;border-bottom:2px solid var(--rune);}
+.admin-table td{padding:0.75rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.88rem;}
+.admin-table tr:hover td{background:rgba(232,160,32,0.02);}
+.pill{padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+.pill-on{background:rgba(144,192,48,0.12);color:var(--air2);border:1px solid var(--air);}
+.pill-off{background:rgba(232,64,32,0.12);color:var(--feu2);border:1px solid var(--feu);}
+.btn-sm{padding:5px 12px;font-size:0.78rem;font-family:'Exo 2',sans-serif;font-weight:600;border-radius:3px;cursor:pointer;transition:all 0.2s;border:1px solid;}
+.btn-sm-edit{background:rgba(32,128,208,0.1);color:var(--eau2);border-color:var(--eau);}
+.btn-sm-edit:hover{background:rgba(32,128,208,0.2);}
+.btn-sm-del{background:rgba(232,64,32,0.1);color:var(--feu2);border-color:var(--feu);}
+.btn-sm-del:hover{background:rgba(232,64,32,0.2);}
+.btn-sm-tog{background:rgba(232,160,32,0.08);color:var(--or2);border-color:var(--or);}
+.btn-sm-tog:hover{background:rgba(232,160,32,0.18);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:0.78rem;color:var(--textm);text-transform:uppercase;letter-spacing:0.08em;}
+.form-input{background:var(--bg3);border:1px solid rgba(232,160,32,0.2);color:var(--text);padding:9px 12px;border-radius:4px;font-family:'Exo 2',sans-serif;font-size:0.9rem;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--or);}
+.form-input option{background:var(--bg3);}
+.admin-section-title{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--or2);margin-bottom:1.2rem;}
+.add-form{background:var(--card);border:1px solid rgba(232,160,32,0.15);border-radius:var(--r);padding:1.5rem;margin-bottom:2rem;}
+.msg-success{background:rgba(144,192,48,0.1);border:1px solid var(--air2);color:var(--air2);padding:10px 16px;border-radius:4px;font-size:0.88rem;margin-bottom:1rem;display:none;}
+.msg-error{background:rgba(232,64,32,0.1);border:1px solid var(--feu2);color:var(--feu2);padding:10px 16px;border-radius:4px;font-size:0.88rem;margin-bottom:1rem;display:none;}
+
+/* ══ REVEAL ══ */
+.rv{opacity:0;transform:translateY(25px);transition:all 0.6s ease;}
+.rv.vis{opacity:1;transform:translateY(0);}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1024px){.dash-grid{grid-template-columns:1fr;}.dash-profile{flex-direction:row;flex-wrap:wrap;justify-content:center;}}
+@media(max-width:768px){
+  .fid-grid,.lb-pod{grid-template-columns:1fr;}
+  .cg{grid-template-columns:1fr;}
+  .stats-inner{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  nav .nav-center{display:none;}
+  .hamburger{display:flex;}
+  .classes-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<canvas id="mc"></canvas>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="nav('home');closeMobile()">Accueil</a>
+  <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150);closeMobile()">Fidélité</a>
+  <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150);closeMobile()">Tarifs</a>
+  <a href="#" onclick="nav('dashboard');closeMobile()" id="mob-dash" style="display:none">Mon compte</a>
+  <a href="https://discord.gg/ktXZf6XskG" target="_blank">Discord</a>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="nav('home')">⚔ DungeonPass</div>
+  <div class="nav-center">
+    
+    <a href="#" onclick="scrollSec('fidelite')">Fidélité</a>
+    <a href="#" onclick="scrollSec('prix')">Tarifs</a>
+    <a href="#" onclick="scrollSec('classement')">Classement</a>
+    <a href="#" onclick="nav('dashboard')" id="nav-dash" style="display:none">Mon compte</a>
+    <a href="#" onclick="nav('admin')" id="nav-admin" style="display:none;color:var(--or2)">⚙ Admin</a>
+  </div>
+  <div class="nav-right">
+    <a href="https://discord.gg/ktXZf6XskG" class="btn-discord" target="_blank">💬 Discord</a>
+    <div id="nav-user" style="display:none" class="user-avatar" onclick="nav('dashboard')">
+      <img id="nav-avatar" src="" alt="">
+      <div><div class="uname" id="nav-uname"></div><div class="admin-badge" id="nav-admin-badge" style="display:none">Admin</div></div>
+    </div>
+    <button class="btn-login" id="nav-login" onclick="doLogin()">🔑 Connexion</button>
+    <div class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- ════ HOME ════ -->
+<div class="page active" id="page-home">
+
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="el-icons" id="elIcons"></div>
+    <div class="hero-eyebrow">✦ Service de passages donjon · Dofus FR ✦</div>
+    <h1 class="htitle">
+      <span class="ht1">DungeonPass</span>
+      <span class="ht2">Maître des douze mondes</span>
+    </h1>
+    <p class="hero-sub">Passages donjon professionnels sur Dofus — toutes classes, tous niveaux.<br>Programme fidélité : le <strong>4ème passage à -50%</strong> automatiquement 🎁<br><small style="font-size:0.85em;color:var(--textm);">Passages sur prise de RDV via ticket Discord</small></p>
+    <div class="hero-btns">
+      <a href="https://discord.gg/ktXZf6XskG" class="btn-or" target="_blank">💬 Ouvrir un ticket Discord</a>
+      <button class="btn-outline" onclick="scrollSec('prix')">📋 Voir les tarifs</button>
+    </div>
+  </div>
+
+  <div class="statsbar">
+    <div class="stats-inner">
+      <div class="stat"><span class="snum sg" id="sp">—</span><span class="slabel">Passages effectués</span></div>
+      <div class="stat"><span class="snum se" id="sj">—</span><span class="slabel">Aventuriers fidèles</span></div>
+      <div class="stat"><span class="snum sa">-50%</span><span class="slabel">Remise fidélité</span></div>
+      <div class="stat"><span class="snum sf">📅</span><span class="slabel">Sur prise de RDV</span></div>
+    </div>
+  </div>
+
+<div class="divider"></div>
+
+  <!-- FIDÉLITÉ -->
+  <section class="sec" id="fidelite">
+    <div class="rv" style="text-align:center;max-width:650px;margin:0 auto;">
+      <div class="stag tag-or">Programme fidélité</div>
+      <h2 class="sh">Accumule, <span class="a-or">économise des kamas</span></h2>
+      <p style="color:var(--textm);margin-top:0.8rem;">Système automatique intégré au bot Discord. Ta progression est sauvegardée en permanence.</p>
+    </div>
+    <div class="fid-grid">
+      <div class="fid-steps rv">
+        <div class="fstep"><div class="fstep-ico ic1">01</div><div><div class="fstep-t">🎫 Ouvre un ticket Discord</div><div class="fstep-d">Choisis ta catégorie et ton donjon dans le menu interactif</div></div></div>
+        <div class="fstep"><div class="fstep-ico ic2">02</div><div><div class="fstep-t">⚔️ On fait le donjon ensemble</div><div class="fstep-d">Je te rejoins en jeu — toutes classes, tous éléments bienvenus</div></div></div>
+        <div class="fstep"><div class="fstep-ico ic3">03</div><div><div class="fstep-t">✅ Passage validé & comptabilisé</div><div class="fstep-d">Le bot met à jour ton compteur de fidélité instantanément</div></div></div>
+        <div class="fstep sp"><div class="fstep-ico ic4">🎁</div><div><div class="fstep-t">4ème passage à -50% automatique !</div><div class="fstep-d">Le prix réduit s'affiche directement dans ton ticket</div></div></div>
+      </div>
+      <div class="fid-visual rv">
+        <div class="kamas-box">
+          <span class="kb-icon">💰</span>
+          <div class="kb-pct">-50%</div>
+          <div class="kb-sub">sur le 4ème passage</div>
+          <div class="kb-det">Économise des kamas à chaque cycle · Automatique · Sans action requise</div>
+        </div>
+        <div style="text-align:center;">
+          <p style="font-size:0.78rem;color:var(--textd);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.1em;font-family:'Cinzel',serif;">Cycle fidélité</p>
+          <div class="cycle">
+            <div class="cy n">1</div><div class="cy-arr">→</div>
+            <div class="cy n">2</div><div class="cy-arr">→</div>
+            <div class="cy n">3</div><div class="cy-arr">→</div>
+            <div class="cy g">🎁</div>
+          </div>
+          <p style="margin-top:1.2rem;color:var(--textm);font-size:0.85rem;line-height:1.8;">Tape <strong style="color:var(--or2);font-family:'Cinzel',serif;">/fidelite</strong> sur Discord<br>ou <button onclick="nav('dashboard')" style="background:none;border:none;color:var(--or);cursor:pointer;font-weight:700;font-size:0.85rem;font-family:'Exo 2',sans-serif;text-decoration:underline;">connecte-toi ici</button> pour voir ta progression</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PRIX -->
+  <div class="prix-wrap" id="prix">
+    <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;">
+      <div class="rv" style="text-align:center;max-width:650px;margin:0 auto;">
+        <div class="stag tag-eau">Tarifs</div>
+        <h2 class="sh">Prix fixés, <span class="a-eau">transparents</span></h2>
+        <p style="color:var(--textm);margin-top:0.8rem;">Tous les prix en kamas · Remise -50% affichée automatiquement · 👑 = boss légendaire</p>
+      </div>
+      <div class="psrch-wrap rv">
+        <span class="psrch-ico">🔍</span>
+        <input type="text" class="psrch" id="psrch" placeholder="Chercher un donjon, une dimension, un boss..." oninput="filterP(this.value)">
+      </div>
+      <div class="cg rv" id="catsGrid">
+        <div style="text-align:center;color:var(--textm);padding:3rem;grid-column:1/-1;">⏳ Chargement...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CLASSEMENT -->
+  <section class="sec" id="classement">
+    <div class="rv" style="text-align:center;max-width:650px;margin:0 auto;">
+      <div class="stag tag-air">Hall of Fame</div>
+      <h2 class="sh">Les aventuriers <span class="a-vi">les plus téméraires</span></h2>
+    </div>
+    <div class="rv">
+      <div class="lb-pod">
+        <div class="pc r2"><span class="pmed">🥈</span><div class="prnk">2ème</div><div class="pnm2" id="lb2n">—</div><div class="pnum" id="lb2c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb2b" style="width:0%"></div></div></div>
+        <div class="pc r1"><span class="pmed">🥇</span><div class="prnk">Champion</div><div class="pnm2" id="lb1n">—</div><div class="pnum" id="lb1c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb1b" style="width:0%"></div></div></div>
+        <div class="pc r3"><span class="pmed">🥉</span><div class="prnk">3ème</div><div class="pnm2" id="lb3n">—</div><div class="pnum" id="lb3c">—</div><div class="plbl">passages</div><div class="pbar"><div class="pbar-f" id="lb3b" style="width:0%"></div></div></div>
+      </div>
+      <div class="lblist" id="lbList"></div>
+    </div>
+    <p style="text-align:center;margin-top:1.2rem;color:var(--textd);font-size:0.85rem;font-family:'Cinzel',serif;">✦ /classement sur Discord pour le top complet ✦</p>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-sec">
+    <div class="cta-box rv">
+      <div class="cta-elem">
+        <div class="cta-elem-pill cep-feu">🔥 Feu</div>
+        <div class="cta-elem-pill cep-eau">💧 Eau</div>
+        <div class="cta-elem-pill cep-air">💨 Air</div>
+        <div class="cta-elem-pill cep-terre">🌿 Terre</div>
+      </div>
+      <h2 class="cta-t">Prêt à conquérir les donjons ?</h2>
+      <p class="cta-s">Rejoins le Discord, ouvre un ticket et choisis ton donjon. Toutes classes, prix fixes, fidélité automatique.</p>
+      <div class="cta-feats">
+        <div class="cfeat">Prix fixes</div>
+        <div class="cfeat">-50% auto</div>
+        <div class="cfeat">Ticket privé</div>
+        <div class="cfeat">Sur RDV Discord</div>
+      </div>
+      <a href="https://discord.gg/ktXZf6XskG" class="btn-or" target="_blank" style="display:inline-flex;font-size:1rem;padding:15px 40px;">💬 Rejoindre le Discord</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="felem">
+      <div class="fep ep-feu">🔥 Feu</div>
+      <div class="fep ep-eau">💧 Eau</div>
+      <div class="fep ep-air">💨 Air</div>
+      <div class="fep ep-terre">🌿 Terre</div>
+    </div>
+    <div class="flogo">⚔ DungeonPass</div>
+    <p>Service de passages donjon Dofus · Non affilié à Ankama Games</p>
+  </footer>
+</div>
+
+<!-- ════ DASHBOARD ════ -->
+<div class="page" id="page-dashboard">
+  <section class="sec">
+    <div class="stag tag-or">Mon compte</div>
+    <h2 class="sh">Ta <span class="a-or">progression</span></h2>
+    <div id="dash-login-prompt" style="text-align:center;padding:4rem 2rem;">
+      <div style="font-size:4rem;margin-bottom:1rem;">🔑</div>
+      <h3 style="font-family:'Cinzel',serif;color:var(--or3);margin-bottom:0.8rem;">Connecte-toi pour voir ta progression</h3>
+      <p style="color:var(--textm);margin-bottom:2rem;">Utilise ton compte Discord pour accéder à tes statistiques de fidélité.</p>
+      <button class="btn-or" onclick="doLogin()">🔑 Se connecter avec Discord</button>
+    </div>
+    <div id="dash-content" style="display:none;">
+      <div class="dash-grid">
+        <div class="dash-profile">
+          <img class="dash-avatar" id="dash-avatar" src="" alt="">
+          <div class="dash-name" id="dash-name">—</div>
+          <div class="dash-tag">Aventurier DungeonPass</div>
+          <div class="progress-ring">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="ring-bg" cx="70" cy="70" r="58"/>
+              <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="58" stroke="url(#rg)" stroke-dasharray="364" stroke-dashoffset="364"/>
+              <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E8A020"/><stop offset="100%" stop-color="#FFD970"/></linearGradient></defs>
+            </svg>
+            <div class="ring-text"><div class="ring-num" id="ring-num">0/3</div><div class="ring-sub">vers -50%</div></div>
+          </div>
+          <div class="dash-stats">
+            <div class="ds-card"><span class="ds-num" id="ds-total" style="color:var(--or3)">0</span><span class="ds-lbl">Passages</span></div>
+            <div class="ds-card"><span class="ds-num" id="ds-remises" style="color:var(--air2)">0</span><span class="ds-lbl">Remises</span></div>
+          </div>
+        </div>
+        <div class="dash-main">
+          <div id="remise-banner" class="remise-banner" style="display:none;"><div class="remise-ico">🎁</div><div><div class="remise-t">-50% disponible sur ton prochain passage !</div><div class="remise-s">La remise sera appliquée automatiquement lors de l'ouverture du ticket.</div></div></div>
+          <div class="dash-card"><div class="dash-card-head"><span class="dash-card-title">⚔️ Progression fidélité</span></div><div class="dash-card-body"><div class="fid-progress" id="fidProgress"></div></div></div>
+          <div class="dash-card"><div class="dash-card-head"><span class="dash-card-title">📜 Historique des passages</span></div><div class="dash-card-body"><div class="hist-list" id="histList"><div style="color:var(--textm);font-size:0.88rem;">Aucun passage pour l'instant.</div></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════ ADMIN ════ -->
+<div class="page" id="page-admin">
+  <section class="sec">
+    <div class="stag tag-or">Administration</div>
+    <h2 class="sh">Panel <span class="a-or">Admin</span></h2>
+    <div class="admin-tabs">
+      <button class="atab active" onclick="adminTab('joueurs')">👥 Joueurs</button>
+      <button class="atab" onclick="adminTab('donjons')">🗡️ Donjons</button>
+      <button class="atab" onclick="adminTab('passages')">📜 Passages récents</button>
+    </div>
+    <div class="admin-panel active" id="ap-joueurs">
+      <div id="msg-joueurs" class="msg-success"></div>
+      <div class="admin-section-title">Tous les joueurs</div>
+      <div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>Joueur</th><th>Passages</th><th>Remises</th><th>Statut fidélité</th><th>Actions</th></tr></thead><tbody id="adminUsersTbody"><tr><td colspan="5" style="text-align:center;color:var(--textm);padding:2rem;">Chargement...</td></tr></tbody></table></div>
+    </div>
+    <div class="admin-panel" id="ap-donjons">
+      <div id="msg-donjons" class="msg-success"></div>
+      <div class="add-form">
+        <div class="admin-section-title">➕ Ajouter un donjon</div>
+        <div class="form-row">
+          <div class="form-group"><label>Catégorie</label><select class="form-input" id="newDonjonCat" style="cursor:pointer;"></select></div>
+          <div class="form-group"><label>Nom</label><input type="text" class="form-input" id="newDonjonNom" placeholder="Ex: Anerice"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Prix en kamas</label><input type="number" class="form-input" id="newDonjonPrix" placeholder="1500000"></div>
+          <div class="form-group" style="justify-content:flex-end;padding-top:1.5rem;"><button class="btn-or" onclick="addDonjon()" style="width:100%;">Ajouter</button></div>
+        </div>
+      </div>
+      <div class="add-form">
+        <div class="admin-section-title">➕ Ajouter une catégorie</div>
+        <div class="form-row">
+          <div class="form-group"><label>Nom</label><input type="text" class="form-input" id="newCatNom" placeholder="Ex: Frigost II"></div>
+          <div class="form-group"><label>Emoji</label><input type="text" class="form-input" id="newCatEmoji" placeholder="❄️"></div>
+        </div>
+        <button class="btn-outline" onclick="addCategory()">Créer la catégorie</button>
+      </div>
+      <div class="admin-section-title">Tous les donjons</div>
+      <div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>Catégorie</th><th>Donjon</th><th>Prix</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="adminDonjonsTbody"><tr><td colspan="5" style="text-align:center;color:var(--textm);padding:2rem;">Chargement...</td></tr></tbody></table></div>
+    </div>
+    <div class="admin-panel" id="ap-passages">
+      <div class="admin-section-title">50 derniers passages</div>
+      <div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>Joueur</th><th>Donjon</th><th>Prix payé</th><th>Type</th><th>Date</th></tr></thead><tbody id="adminPassagesTbody"><tr><td colspan="5" style="text-align:center;color:var(--textm);padding:2rem;">Chargement...</td></tr></tbody></table></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ── CANVAS : PORTAIL DOFUS — PARTICULES + ÉCLAIRS + RUNES ───────────────────
+const cvs=document.getElementById('mc'),ctx=cvs.getContext('2d');
+let W,H;
+function resize(){W=cvs.width=innerWidth;H=cvs.height=innerHeight;}
+resize();addEventListener('resize',resize);
+
+// Runes inspirées du portail Dofus
+const RUNES=['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ','✦','✧','◆','★','⬟'];
+const COLORS=[
+  [60,150,255],[80,180,255],[100,200,255],  // bleus portail
+  [140,100,255],[180,80,255],               // violets magie
+  [255,255,255],[200,220,255],              // blanc éclat
+  [60,220,255],[40,180,220],               // cyan rune
+];
+
+// ── PARTICULES RUNE ──────────────────────────────────────────────────────────
+class RuneParticle{
+  constructor(init=false){this.reset(init);}
+  reset(init=false){
+    this.x=Math.random()*W;
+    this.y=init?Math.random()*H:H+20;
+    this.rune=RUNES[Math.floor(Math.random()*RUNES.length)];
+    this.col=COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.sz=Math.random()*16+7;
+    this.vx=(Math.random()-.5)*.3;
+    this.vy=-(Math.random()*.45+.12);
+    this.rot=Math.random()*Math.PI*2;
+    this.rv=(Math.random()-.5)*.015;
+    this.life=0;
+    this.maxL=Math.random()*700+400;
+    this.alpha=0;
+    this.mA=Math.random()*.28+.04;
+  }
+  update(){
+    this.x+=this.vx;this.y+=this.vy;this.rot+=this.rv;this.life++;
+    const f=this.life<100?this.life/100:this.life>this.maxL-100?(this.maxL-this.life)/100:1;
+    this.alpha=this.mA*f;
+    if(this.life>this.maxL||this.y<-40)this.reset();
+  }
+  draw(){
+    const [r,g,b]=this.col;
+    ctx.save();
+    ctx.globalAlpha=this.alpha;
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.rot);
+    ctx.font=`${this.sz}px serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor=`rgba(${r},${g},${b},0.8)`;
+    ctx.shadowBlur=this.sz*1.2;
+    ctx.fillStyle=`rgba(${r},${g},${b},1)`;
+    ctx.fillText(this.rune,0,0);
+    // Double glow
+    ctx.globalAlpha=this.alpha*0.4;
+    ctx.shadowBlur=this.sz*2.5;
+    ctx.fillText(this.rune,0,0);
+    ctx.restore();
   }
 }
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(f => f.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const event = require(path.join(eventsPath, file));
-  if (event.once) {
-    client.once(event.name, (...args) => event.execute(...args, client));
-  } else {
-    client.on(event.name, (...args) => event.execute(...args, client));
+// ── ÉTOILES / ÉTINCELLES ─────────────────────────────────────────────────────
+class Spark{
+  constructor(){this.reset(true);}
+  reset(init=false){
+    this.x=Math.random()*W;
+    this.y=init?Math.random()*H:Math.random()*H;
+    this.r=Math.random()*1.5+0.3;
+    this.alpha=Math.random()*.6+.1;
+    this.pulse=Math.random()*Math.PI*2;
+    this.pulseSpeed=Math.random()*.03+.01;
+    this.col=COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.life=Math.random()*300;
+    this.maxL=Math.random()*400+200;
   }
-  console.log(`✅ Event chargé : ${event.name}`);
+  update(){
+    this.pulse+=this.pulseSpeed;this.life++;
+    if(this.life>this.maxL)this.reset();
+  }
+  draw(){
+    const [r,g,b]=this.col;
+    const a=this.alpha*(0.5+0.5*Math.sin(this.pulse));
+    ctx.save();
+    ctx.globalAlpha=a;
+    ctx.shadowColor=`rgba(${r},${g},${b},0.9)`;
+    ctx.shadowBlur=this.r*6;
+    ctx.fillStyle=`rgba(${r},${g},${b},1)`;
+    ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fill();
+    // Croix d'étoile
+    ctx.globalAlpha=a*0.6;
+    ctx.strokeStyle=`rgba(${r},${g},${b},1)`;
+    ctx.lineWidth=this.r*.4;
+    const s=this.r*3;
+    ctx.beginPath();ctx.moveTo(this.x-s,this.y);ctx.lineTo(this.x+s,this.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(this.x,this.y-s);ctx.lineTo(this.x,this.y+s);ctx.stroke();
+    ctx.restore();
+  }
 }
 
-client.on(Events.InteractionCreate, async interaction => {
-  if (interaction.isChatInputCommand()) {
-    const command = client.commands.get(interaction.commandName);
-    if (!command) return;
-    try {
-      await command.execute(interaction, client);
-    } catch (err) {
-      console.error(`Erreur commande /${interaction.commandName}:`, err);
-      const msg = { content: '❌ Une erreur est survenue.', ephemeral: true };
-      if (interaction.replied || interaction.deferred) await interaction.followUp(msg);
-      else await interaction.reply(msg);
+// ── ÉCLAIRS ──────────────────────────────────────────────────────────────────
+class Lightning{
+  constructor(){this.reset();}
+  reset(){
+    this.active=false;
+    this.timer=Math.random()*200+80;
+    this.life=0;
+    this.maxL=Math.random()*8+4;
+  }
+  trigger(){
+    this.active=true;
+    this.life=0;
+    // Point de départ aléatoire en haut
+    this.x1=Math.random()*W;
+    this.y1=0;
+    this.x2=this.x1+(Math.random()-.5)*300;
+    this.y2=Math.random()*H*0.7+H*0.1;
+    this.segs=this.buildSegments(this.x1,this.y1,this.x2,this.y2,5);
+    this.col=COLORS[Math.floor(Math.random()*3)]; // bleus
+  }
+  buildSegments(x1,y1,x2,y2,depth){
+    if(depth===0)return[[x1,y1,x2,y2]];
+    const mx=(x1+x2)/2+(Math.random()-.5)*80;
+    const my=(y1+y2)/2+(Math.random()-.5)*40;
+    return[...this.buildSegments(x1,y1,mx,my,depth-1),...this.buildSegments(mx,my,x2,y2,depth-1)];
+  }
+  update(){
+    if(this.active){
+      this.life++;
+      if(this.life>this.maxL){this.active=false;this.timer=Math.random()*300+100;}
+    } else {
+      this.timer--;
+      if(this.timer<=0)this.trigger();
     }
   }
+  draw(){
+    if(!this.active)return;
+    const [r,g,b]=this.col;
+    const a=Math.max(0,1-this.life/this.maxL);
+    ctx.save();
+    ctx.globalAlpha=a*0.7;
+    ctx.strokeStyle=`rgba(${r},${g},${b},1)`;
+    ctx.shadowColor=`rgba(${r},${g},${b},0.9)`;
+    ctx.shadowBlur=12;
+    ctx.lineWidth=1.5;
+    this.segs.forEach(([x1,y1,x2,y2])=>{
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    });
+    // Glow plus large
+    ctx.globalAlpha=a*0.25;
+    ctx.lineWidth=4;
+    ctx.shadowBlur=25;
+    this.segs.forEach(([x1,y1,x2,y2])=>{
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    });
+    ctx.restore();
+  }
+}
 
-  if (interaction.isButton()) {
-    const [action, ...args] = interaction.customId.split(':');
-    const handler = require('./utils/buttonHandler');
-    try {
-      await handler(interaction, action, args, client);
-    } catch (err) {
-      console.error('Erreur bouton:', err);
-      const msg = { content: '❌ Une erreur est survenue.', ephemeral: true };
-      if (interaction.replied || interaction.deferred) await interaction.followUp(msg);
-      else await interaction.reply(msg);
-    }
-  }
+// ── BRUME PORTAIL (bas de page) ───────────────────────────────────────────────
+let fogOffset=0;
+function drawFog(){
+  const grad=ctx.createLinearGradient(0,H*0.75,0,H);
+  grad.addColorStop(0,'rgba(20,40,120,0)');
+  grad.addColorStop(0.5,'rgba(10,20,80,0.06)');
+  grad.addColorStop(1,'rgba(5,10,40,0.12)');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,H*0.75,W,H*0.25);
+}
 
-  if (interaction.isStringSelectMenu()) {
-    const handler = require('./utils/selectHandler');
-    try {
-      await handler(interaction, client);
-    } catch (err) {
-      console.error('Erreur select:', err);
-    }
-  }
+const runes=Array.from({length:90},(_,i)=>{const p=new RuneParticle(true);p.life=Math.random()*p.maxL;return p;});
+const sparks=Array.from({length:120},()=>new Spark());
+const lightnings=Array.from({length:4},()=>new Lightning());
+
+function anim(){
+  ctx.clearRect(0,0,W,H);
+  drawFog();
+  sparks.forEach(s=>{s.update();s.draw();});
+  runes.forEach(p=>{p.update();p.draw();});
+  lightnings.forEach(l=>{l.update();l.draw();});
+  requestAnimationFrame(anim);
+}
+anim();
+
+// Icônes flottantes hero
+const heroEls=['🔥','💧','💨','🌿','⚔️','🏹','💀','🎲','🐉','🛡️','💣','🎭','⏳','✨'];
+const elCont=document.getElementById('elIcons');
+heroEls.forEach((e,i)=>{
+  const d=document.createElement('div');
+  d.className='el-icon';
+  d.textContent=e;
+  d.style.left=(3+i*7)+'%';
+  d.style.animationDuration=(14+Math.random()*10)+'s';
+  d.style.animationDelay=(Math.random()*14)+'s';
+  elCont.appendChild(d);
 });
 
-const clientStore = require('./utils/clientStore');
-const token = process.env.DISCORD_TOKEN;
-client.once('ready', () => {
-  clientStore.set(client);
-});
-client.login(token);
+// ── APP ───────────────────────────────────────────────────────────────────────
+const API='https://bloodshot-icare-dofus-bot-passage-production.up.railway.app';
+let authToken=localStorage.getItem('dp_token'),currentUser=null;
+
+function nav(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');window.scrollTo(0,0);if(page==='dashboard')loadDashboard();if(page==='admin')loadAdmin();closeMobile();}
+function scrollSec(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},100);}
+function toggleMobile(){document.getElementById('mobileMenu').classList.toggle('open');}
+function closeMobile(){document.getElementById('mobileMenu').classList.remove('open');}
+function doLogin(){window.location.href=API+'/api/auth/discord';}
+
+function handleCallback(){
+  const p=new URLSearchParams(location.search),token=p.get('token'),error=p.get('error');
+  if(token){authToken=token;localStorage.setItem('dp_token',token);history.replaceState({},'',location.pathname);initUser();nav('dashboard');}
+  if(error)alert('Erreur de connexion : '+error);
+}
+
+function initUser(){
+  if(!authToken)return;
+  try{
+    const pl=JSON.parse(atob(authToken.split('.')[1]));currentUser=pl;
+    document.getElementById('nav-login').style.display='none';
+    document.getElementById('nav-user').style.display='flex';
+    document.getElementById('nav-avatar').src=pl.avatar?`https://cdn.discordapp.com/avatars/${pl.id}/${pl.avatar}.png?size=64`:`https://cdn.discordapp.com/embed/avatars/0.png`;
+    document.getElementById('nav-uname').textContent=pl.username;
+    document.getElementById('nav-dash').style.display='';
+    document.getElementById('mob-dash').style.display='';
+    if(pl.isAdmin){document.getElementById('nav-admin').style.display='';document.getElementById('nav-admin-badge').style.display='';}
+  }catch(e){authToken=null;localStorage.removeItem('dp_token');}
+}
+
+function logout(){authToken=null;currentUser=null;localStorage.removeItem('dp_token');location.reload();}
+
+async function apiFetch(path,opts={}){
+  const headers={'Content-Type':'application/json',...(opts.headers||{})};
+  if(authToken)headers['Authorization']='Bearer '+authToken;
+  const res=await fetch(API+path,{...opts,headers});
+  if(!res.ok)throw await res.json();
+  return res.json();
+}
+
+async function loadHome(){
+  try{const s=await apiFetch('/api/stats');animCount(document.getElementById('sp'),s.totalPassages);animCount(document.getElementById('sj'),s.totalJoueurs);}catch(e){}
+  try{
+    const lb=await apiFetch('/api/leaderboard'),top3=lb.slice(0,3),order=[top3[1],top3[0],top3[2]],ids=['lb2','lb1','lb3'],max=top3[0]?.total_passages||1;
+    order.forEach((u,i)=>{if(!u)return;document.getElementById(ids[i]+'n').textContent=u.username;document.getElementById(ids[i]+'c').textContent=u.total_passages;setTimeout(()=>{document.getElementById(ids[i]+'b').style.width=Math.round(u.total_passages/max*100)+'%';},500);});
+    document.getElementById('lbList').innerHTML=lb.slice(3).map((u,i)=>`<div class="lbi"><div class="lbpos">${i+4}</div><div class="lbnm">${u.username}</div><div class="lbcnt">${u.total_passages}</div><div class="lbbar"><div class="lbbar-f" style="width:${Math.round(u.total_passages/max*100)}%"></div></div></div>`).join('');
+  }catch(e){}
+  try{
+    const cats=await apiFetch('/api/categories');
+    const bosses=['eternel conflit','protozorreur','servitude','solar','bethel','kabahal','belladone','cire momore'];
+    document.getElementById('catsGrid').innerHTML=cats.map((c,ci)=>`<div class="cc ${ci===0?'open':''}"><div class="ch" onclick="this.parentElement.classList.toggle('open')"><span class="cemo">${c.emoji}</span><span class="ctit">${c.nom}</span><span class="cbdg">${c.donjons.length} donjons</span><span class="cchv">▾</span></div><div class="cbody">${c.donjons.map(d=>`<div class="prow${bosses.some(b=>d.nom.toLowerCase().includes(b))?' boss':''}" data-name="${d.nom.toLowerCase()}"><span class="pname">${d.nom}</span><span class="pval ${d.prix===0?'ptbd':''}">${d.prix>0?fmtK(d.prix):'Prix à définir'}</span></div>`).join('')}</div></div>`).join('');
+  }catch(e){document.getElementById('catsGrid').innerHTML='<div style="text-align:center;color:var(--textm);padding:3rem;grid-column:1/-1;">⚠️ Impossible de charger les donjons.</div>';}
+}
+
+function filterP(q){q=q.toLowerCase().trim();document.querySelectorAll('.cc').forEach(c=>{let has=false;c.querySelectorAll('.prow').forEach(r=>{const m=!q||r.dataset.name.includes(q);r.style.display=m?'':'none';if(m)has=true;});c.style.display=(has||!q)?'':'none';if(q&&has)c.classList.add('open');});}
+
+async function loadDashboard(){
+  if(!authToken){document.getElementById('dash-login-prompt').style.display='';document.getElementById('dash-content').style.display='none';return;}
+  document.getElementById('dash-login-prompt').style.display='none';document.getElementById('dash-content').style.display='';
+  try{
+    const data=await apiFetch('/api/me');if(!data.user)return;const u=data.user;
+    document.getElementById('dash-avatar').src=u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=128`:`https://cdn.discordapp.com/embed/avatars/0.png`;
+    document.getElementById('dash-name').textContent=u.username;
+    document.getElementById('ds-total').textContent=u.total_passages;
+    document.getElementById('ds-remises').textContent=u.remises_utilisees;
+    const f=data.fidelite,pos=u.total_passages%(data.passages_avant_remise+1);
+    document.getElementById('ring-num').textContent=pos+'/'+data.passages_avant_remise;
+    setTimeout(()=>{document.getElementById('ringFill').style.strokeDashoffset=Math.round(364*(1-pos/data.passages_avant_remise));},300);
+    document.getElementById('remise-banner').style.display=f.estRemise?'flex':'none';
+    const dots=[];
+    for(let i=0;i<data.passages_avant_remise;i++){const isDone=i<pos,isCur=i===pos&&!f.estRemise;dots.push(`<div class="fdot ${isDone?'done':isCur?'current':'empty'}">${isDone?'✓':i+1}</div>`);}
+    dots.push(`<div class="fdot ${f.estRemise?'gift':'empty'}">🎁</div>`);
+    document.getElementById('fidProgress').innerHTML=`<div class="fid-dots">${dots.join('')}</div><div class="fid-label">${f.estRemise?'🎉 Ton prochain passage est à -50% !':'Encore '+f.passagesRestants+' passage(s) pour le -50%'}</div>`;
+    document.getElementById('histList').innerHTML=data.passages_recent.length===0?'<div style="color:var(--textm);font-size:0.88rem;">Aucun passage pour l\'instant.</div>':data.passages_recent.map(p=>`<div class="hist-item"><span class="hist-badge ${p.est_remise?'hb-remise':'hb-normal'}">${p.est_remise?'🎁 -50%':'⚔️ Payant'}</span><span class="hist-don">${p.donjon_nom||'?'} <span style="color:var(--textd);font-size:0.8rem;">${p.cat_nom?'· '+p.cat_nom:''}</span></span><span class="hist-prix">${p.prix_paye>0?fmtK(p.prix_paye):'—'}</span><span class="hist-date">${new Date(p.created_at).toLocaleDateString('fr-FR')}</span></div>`).join('');
+  }catch(e){console.error(e);}
+}
+
+function adminTab(t){document.querySelectorAll('.atab').forEach((b,i)=>b.classList.toggle('active',['joueurs','donjons','passages'][i]===t));document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));document.getElementById('ap-'+t).classList.add('active');if(t==='joueurs')loadAdminUsers();if(t==='donjons')loadAdminDonjons();if(t==='passages')loadAdminPassages();}
+async function loadAdmin(){if(!currentUser?.isAdmin){alert('Accès refusé');nav('home');return;}loadAdminUsers();loadAdminDonjons();}
+async function loadAdminUsers(){try{const users=await apiFetch('/api/admin/users');document.getElementById('adminUsersTbody').innerHTML=users.map(u=>`<tr><td style="font-weight:600">${u.username}</td><td><span style="font-family:'Cinzel',serif;color:var(--or3)">${u.total_passages}</span></td><td>${u.remises_utilisees}</td><td>${u.fidelite.estRemise?'<span class="pill pill-on">🎁 -50% dispo</span>':u.fidelite.passagesRestants+' restants'}</td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-sm btn-sm-edit" onclick="adjustUser('${u.id}','${u.username}',1)">+1</button><button class="btn-sm btn-sm-del" onclick="adjustUser('${u.id}','${u.username}',-1)">-1</button><button class="btn-sm btn-sm-del" onclick="resetUser('${u.id}','${u.username}')">Reset</button></td></tr>`).join('');}catch(e){showMsg('msg-joueurs','Erreur chargement',false);}}
+async function adjustUser(id,name,delta){if(!confirm(`${delta>0?'+1':'-1'} passage pour ${name} ?`))return;try{await apiFetch('/api/admin/users/'+id+'/adjust',{method:'POST',body:JSON.stringify({delta})});showMsg('msg-joueurs',`✅ ${name} mis à jour`,true);loadAdminUsers();}catch(e){showMsg('msg-joueurs','❌ Erreur',false);}}
+async function resetUser(id,name){if(!confirm(`Remettre ${name} à zéro ?`))return;try{await apiFetch('/api/admin/users/'+id+'/reset',{method:'POST'});showMsg('msg-joueurs',`✅ ${name} remis à zéro`,true);loadAdminUsers();}catch(e){showMsg('msg-joueurs','❌ Erreur',false);}}
+async function loadAdminDonjons(){try{const cats=await apiFetch('/api/admin/donjons');document.getElementById('newDonjonCat').innerHTML=cats.map(c=>`<option value="${c.id}">${c.emoji} ${c.nom}</option>`).join('');let rows='';cats.forEach(c=>c.donjons.forEach(d=>{rows+=`<tr><td style="color:var(--textm)">${c.emoji} ${c.nom}</td><td style="font-weight:600">${d.nom}</td><td><span style="font-family:'Cinzel',serif;color:var(--or2)">${d.prix>0?fmtK(d.prix):'—'}</span></td><td><span class="pill ${d.actif?'pill-on':'pill-off'}">${d.actif?'Actif':'Inactif'}</span></td><td style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-sm btn-sm-edit" onclick="editPrix(${d.id},'${d.nom}',${d.prix})">💰 Prix</button><button class="btn-sm btn-sm-tog" onclick="toggleDonjon(${d.id})">${d.actif?'Désactiver':'Activer'}</button></td></tr>`;}));document.getElementById('adminDonjonsTbody').innerHTML=rows;}catch(e){}}
+async function editPrix(id,nom,pa){const v=prompt(`Nouveau prix pour ${nom} :`,pa);if(v===null)return;const p=parseInt(v);if(isNaN(p)||p<0){alert('Prix invalide');return;}try{await apiFetch('/api/admin/donjons/'+id+'/prix',{method:'PUT',body:JSON.stringify({prix:p})});showMsg('msg-donjons',`✅ ${nom} → ${fmtK(p)}`,true);loadAdminDonjons();loadHome();}catch(e){showMsg('msg-donjons','❌ Erreur',false);}}
+async function toggleDonjon(id){try{await apiFetch('/api/admin/donjons/'+id+'/toggle',{method:'PUT'});loadAdminDonjons();loadHome();}catch(e){}}
+async function addDonjon(){const cat=document.getElementById('newDonjonCat').value,nom=document.getElementById('newDonjonNom').value.trim(),prix=parseInt(document.getElementById('newDonjonPrix').value);if(!nom||isNaN(prix)){showMsg('msg-donjons','❌ Remplis tous les champs',false);return;}try{await apiFetch('/api/admin/donjons',{method:'POST',body:JSON.stringify({categorie_id:parseInt(cat),nom,prix})});showMsg('msg-donjons',`✅ ${nom} ajouté !`,true);document.getElementById('newDonjonNom').value='';document.getElementById('newDonjonPrix').value='';loadAdminDonjons();loadHome();}catch(e){showMsg('msg-donjons','❌ '+(e.error||'Erreur'),false);}}
+async function addCategory(){const nom=document.getElementById('newCatNom').value.trim(),emoji=document.getElementById('newCatEmoji').value.trim()||'⚔️';if(!nom){showMsg('msg-donjons','❌ Donne un nom',false);return;}try{await apiFetch('/api/admin/categories',{method:'POST',body:JSON.stringify({nom,emoji})});showMsg('msg-donjons',`✅ "${nom}" créée !`,true);document.getElementById('newCatNom').value='';document.getElementById('newCatEmoji').value='';loadAdminDonjons();}catch(e){showMsg('msg-donjons','❌ '+(e.error||'Erreur'),false);}}
+async function loadAdminPassages(){try{const p=await apiFetch('/api/admin/passages');document.getElementById('adminPassagesTbody').innerHTML=p.map(p=>`<tr><td style="font-weight:600">${p.username}</td><td>${p.donjon_nom||'?'}</td><td style="font-family:'Cinzel',serif;color:var(--or2)">${p.prix_paye>0?fmtK(p.prix_paye):'—'}</td><td><span class="pill ${p.est_remise?'pill-on':'hb-normal'}">${p.est_remise?'🎁 -50%':'⚔️ Payant'}</span></td><td style="color:var(--textd);font-size:0.82rem">${new Date(p.created_at).toLocaleString('fr-FR')}</td></tr>`).join('');}catch(e){}}
+
+function fmtK(n){return n.toLocaleString('fr-FR')+' ₭';}
+function animCount(el,target){let n=0;const step=Math.ceil(target/60);const t=setInterval(()=>{n=Math.min(n+step,target);el.textContent=n.toLocaleString('fr-FR');if(n>=target)clearInterval(t);},25);}
+function showMsg(id,msg,ok){const el=document.getElementById(id);el.textContent=msg;el.className=ok?'msg-success':'msg-error';el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.08});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+if(location.search.includes('token=')||location.search.includes('error='))handleCallback();
+initUser();
+loadHome();
+</script>
+</body>
+</html>
