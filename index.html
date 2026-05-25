@@ -28,7 +28,8 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;font-
 #mc{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* ══ NAV ══ */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(4,4,14,0.96);border-bottom:2px solid var(--rune);box-shadow:0 2px 20px rgba(60,120,255,0.2);}
+nav{position:fixed;top:0;left:260px;right:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(4,4,14,0.96);border-bottom:1px solid rgba(96,192,255,0.2);transition:left 0.3s;}
+nav.sidebar-collapsed{left:0;}
 .nav-logo{font-family:'Cinzel Decorative',serif;font-size:1.15rem;font-weight:900;color:var(--rune2);cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:0.05em;text-shadow:0 0 15px rgba(96,192,255,0.5);}
 .nav-center{display:flex;gap:2rem;}
 .nav-center a{color:var(--textm);text-decoration:none;font-weight:600;font-size:0.83rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;font-family:'Cinzel',serif;}
@@ -43,11 +44,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .user-avatar img{width:32px;height:32px;border-radius:50%;border:2px solid var(--or);}
 .uname{font-size:0.85rem;font-weight:600;color:var(--text);}
 .admin-badge{background:var(--or2);color:#000;font-size:0.62rem;font-weight:700;padding:1px 7px;border-radius:20px;text-transform:uppercase;}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
-.hamburger span{display:block;width:24px;height:2px;background:var(--textm);border-radius:2px;}
-.mobile-menu{display:none;position:fixed;inset:0;background:rgba(10,10,15,0.98);z-index:190;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;}
-.mobile-menu.open{display:flex;}
-.mobile-menu a{color:var(--or3);text-decoration:none;font-size:1.5rem;font-family:'Cinzel',serif;font-weight:700;}
+
 
 /* ══ PAGES ══ */
 .page{display:none;min-height:100vh;padding-top:68px;position:relative;z-index:1;}
@@ -340,6 +337,43 @@ footer p{color:var(--textd);font-size:0.8rem;}
 .rv.vis{opacity:1;transform:translateY(0);}
 
 /* ══ RESPONSIVE ══ */
+
+/* ══ SIDEBAR ══ */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:rgba(4,4,14,0.98);border-right:1px solid rgba(96,192,255,0.15);z-index:300;display:flex;flex-direction:column;transition:transform 0.3s ease;overflow-y:auto;}
+.sidebar.collapsed{transform:translateX(-260px);}
+.sidebar-logo{padding:1.5rem 1.4rem 1rem;border-bottom:1px solid rgba(96,192,255,0.12);flex-shrink:0;}
+.sidebar-logo-text{font-family:'Cinzel Decorative',serif;font-size:1.1rem;font-weight:900;color:var(--rune2);display:block;margin-bottom:0.3rem;text-shadow:0 0 15px rgba(96,192,255,0.4);}
+.sidebar-logo-sub{font-size:0.7rem;color:var(--textd);letter-spacing:0.1em;text-transform:uppercase;}
+.sidebar-nav{flex:1;padding:1rem 0;}
+.sidebar-section{padding:0.4rem 1.4rem;font-size:0.65rem;color:var(--textd);text-transform:uppercase;letter-spacing:0.15em;margin-top:0.8rem;font-family:'Cinzel',serif;}
+.sidebar-link{display:flex;align-items:center;gap:0.8rem;padding:0.75rem 1.4rem;color:var(--textm);text-decoration:none;font-size:0.88rem;font-weight:500;transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Exo 2',sans-serif;position:relative;}
+.sidebar-link:hover{color:var(--text);background:rgba(96,192,255,0.06);}
+.sidebar-link.active{color:var(--rune2);background:rgba(96,192,255,0.1);border-right:2px solid var(--rune);}
+.sidebar-link-icon{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0;}
+.sidebar-link-badge{position:absolute;right:1.2rem;background:rgba(96,192,255,0.15);border:1px solid rgba(96,192,255,0.3);color:var(--rune2);font-size:0.65rem;font-weight:700;padding:1px 7px;border-radius:20px;}
+.sidebar-bottom{padding:1rem 1.4rem;border-top:1px solid rgba(96,192,255,0.1);flex-shrink:0;}
+.sidebar-user{display:flex;align-items:center;gap:0.8rem;padding:0.8rem;background:rgba(96,192,255,0.05);border:1px solid rgba(96,192,255,0.12);border-radius:var(--r);cursor:pointer;transition:background 0.2s;}
+.sidebar-user:hover{background:rgba(96,192,255,0.1);}
+.sidebar-user img{width:36px;height:36px;border-radius:50%;border:2px solid var(--rune);flex-shrink:0;}
+.sidebar-user-info{flex:1;min-width:0;}
+.sidebar-user-name{font-size:0.85rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-user-role{font-size:0.7rem;color:var(--textd);}
+.sidebar-logout{display:flex;align-items:center;gap:6px;width:100%;padding:0.6rem 0.8rem;margin-top:0.6rem;background:rgba(232,64,32,0.08);border:1px solid rgba(232,64,32,0.2);color:var(--feu2);border-radius:4px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Exo 2',sans-serif;transition:background 0.2s;}
+.sidebar-logout:hover{background:rgba(232,64,32,0.15);}
+.sidebar-login-btn{display:flex;align-items:center;gap:8px;width:100%;padding:0.75rem;background:rgba(96,192,255,0.08);border:1px solid rgba(96,192,255,0.25);color:var(--rune2);border-radius:4px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;justify-content:center;transition:background 0.2s;text-transform:uppercase;letter-spacing:0.08em;}
+.sidebar-login-btn:hover{background:rgba(96,192,255,0.15);}
+.sidebar-toggle{position:fixed;top:14px;left:270px;z-index:400;background:rgba(4,4,14,0.9);border:1px solid rgba(96,192,255,0.3);color:var(--rune2);width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.3s;}
+.sidebar-toggle.collapsed{left:10px;}
+.sidebar-divider{height:1px;background:rgba(96,192,255,0.08);margin:0.5rem 1.4rem;}
+
+/* Ajuster le contenu principal */
+.main-content{margin-left:260px;transition:margin-left 0.3s;}
+.main-content.sidebar-collapsed{margin-left:0;}
+
+/* Overlay mobile */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:250;}
+.sidebar-overlay.show{display:block;}
+
 /* ══ TABLETTE 1024px ══ */
 @media(max-width:1024px){
   .dash-grid{grid-template-columns:1fr;}
@@ -358,8 +392,12 @@ footer p{color:var(--textd);font-size:0.8rem;}
 @media(max-width:768px){
   /* Nav */
   nav{padding:0 1rem;height:60px;}
-  nav .nav-center{display:none;}
-  .hamburger{display:flex;}
+  nav{left:0 !important;}
+  .main-content{margin-left:0 !important;}
+  .sidebar{transform:translateX(-260px);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-toggle{left:10px;}
+  .sidebar-toggle.open{left:270px;}
   .btn-discord{padding:7px 12px;font-size:0.78rem;}
   .btn-login{padding:6px 12px;font-size:0.78rem;}
   #nav-user img{width:28px;height:28px;}
@@ -482,34 +520,82 @@ footer p{color:var(--textd);font-size:0.8rem;}
 
 <canvas id="mc"></canvas>
 
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#" onclick="nav('home');closeMobile()">Accueil</a>
-  <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150);closeMobile()">Fidélité</a>
-  <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150);closeMobile()">Tarifs</a>
-  <a href="#" onclick="nav('dashboard');closeMobile()" id="mob-dash" style="display:none">Mon compte</a>
-  <a href="https://discord.gg/ktXZf6XskG" target="_blank">Discord</a>
-</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="sidebar-logo-text">⚔ DungeonPass</span>
+    <span class="sidebar-logo-sub">Passages Donjon Dofus</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Navigation</div>
+    <button class="sidebar-link active" id="sl-home" onclick="nav('home');setSidebarActive('sl-home')">
+      <span class="sidebar-link-icon">🏠</span> Accueil
+    </button>
+    <button class="sidebar-link" id="sl-fidelite" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150);setSidebarActive('sl-fidelite')">
+      <span class="sidebar-link-icon">🎁</span> Fidélité
+    </button>
+    <button class="sidebar-link" id="sl-prix" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150);setSidebarActive('sl-prix')">
+      <span class="sidebar-link-icon">💰</span> Tarifs
+    </button>
+    <button class="sidebar-link" id="sl-classement" onclick="nav('home');setTimeout(()=>scrollSec('classement'),150);setSidebarActive('sl-classement')">
+      <span class="sidebar-link-icon">🏆</span> Classement
+    </button>
+
+    <div class="sidebar-section">Réservation</div>
+    <button class="sidebar-link" id="sl-reserver" onclick="nav('home');setTimeout(()=>scrollSec('reserver'),150);setSidebarActive('sl-reserver')">
+      <span class="sidebar-link-icon">🎫</span> Réserver un passage
+    </button>
+    <a href="https://discord.gg/ktXZf6XskG" class="sidebar-link" target="_blank">
+      <span class="sidebar-link-icon">💬</span> Rejoindre Discord
+    </a>
+
+    <div class="sidebar-section">Mon compte</div>
+    <button class="sidebar-link" id="sl-dashboard" onclick="nav('dashboard');setSidebarActive('sl-dashboard')" style="display:none" id="sb-dash">
+      <span class="sidebar-link-icon">👤</span> Ma progression
+    </button>
+    <button class="sidebar-link" id="sl-admin" onclick="nav('admin');setSidebarActive('sl-admin')" style="display:none" id="sb-admin">
+      <span class="sidebar-link-icon">⚙️</span> Administration
+      <span class="sidebar-link-badge">Admin</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <!-- Non connecté -->
+    <div id="sb-login-area">
+      <button class="sidebar-login-btn" onclick="doLogin()">🔑 Connexion Discord</button>
+    </div>
+    <!-- Connecté -->
+    <div id="sb-user-area" style="display:none">
+      <div class="sidebar-user" onclick="nav('dashboard');setSidebarActive('sl-dashboard')">
+        <img id="sb-avatar" src="" alt="">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sb-name">—</div>
+          <div class="sidebar-user-role" id="sb-role">Aventurier</div>
+        </div>
+      </div>
+      <button class="sidebar-logout" onclick="logout()">✕ Se déconnecter</button>
+    </div>
+  </div>
+</aside>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+
+<div class="main-content" id="mainContent">
 
 <nav>
-  <div class="nav-logo" onclick="nav('home')">⚔ DungeonPass</div>
-  <div class="nav-center">
-    
-    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('fidelite'),150)">Fidélité</a>
-    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('prix'),150)">Tarifs</a>
-    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('classement'),150)">Classement</a>
-    <a href="#" onclick="nav('home');setTimeout(()=>scrollSec('reserver'),150)" style="color:var(--rune2);">🎫 Réserver</a>
-    <a href="#" onclick="nav('dashboard')" id="nav-dash" style="display:none">Mon compte</a>
-    <a href="#" onclick="nav('admin')" id="nav-admin" style="display:none;color:var(--or2)">⚙ Admin</a>
-  </div>
+  
+  <div style="font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--rune2);letter-spacing:0.05em;">⚔ DungeonPass</div>
   <div class="nav-right">
     <a href="https://discord.gg/ktXZf6XskG" class="btn-discord" target="_blank">💬 Discord</a>
-    <div id="nav-user" style="display:none" class="user-avatar">
+    <div id="nav-user" style="display:none!important" class="user-avatar">
       <img id="nav-avatar" src="" alt="" onclick="nav('dashboard')" style="cursor:pointer;">
       <div onclick="nav('dashboard')" style="cursor:pointer;"><div class="uname" id="nav-uname"></div><div class="admin-badge" id="nav-admin-badge" style="display:none">Admin</div></div>
       <button onclick="logout()" style="background:rgba(232,64,32,0.15);border:1px solid var(--feu);color:var(--feu2);padding:4px 10px;border-radius:4px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Exo 2',sans-serif;margin-left:4px;">✕</button>
     </div>
-    <button class="btn-login" id="nav-login" onclick="doLogin()">🔑 Connexion</button>
-    <div class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></div>
+    <button class="btn-login" id="nav-login" onclick="doLogin()" style="display:none">🔑 Connexion</button>
+
   </div>
 </nav>
 
@@ -1016,6 +1102,7 @@ function initUser(){
     document.getElementById('nav-dash').style.display='';
     document.getElementById('mob-dash').style.display='';
     if(pl.isAdmin){document.getElementById('nav-admin').style.display='';document.getElementById('nav-admin-badge').style.display='';}
+  updateSidebarUser();
   }catch(e){authToken=null;localStorage.removeItem('dp_token');}
 }
 
@@ -1094,6 +1181,74 @@ function showMsg(id,msg,ok){const el=document.getElementById(id);el.textContent=
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:0.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 
+
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const mc=document.getElementById('mainContent');
+  const nav=document.querySelector('nav');
+  const toggle=document.getElementById('sidebarToggle');
+  const overlay=document.getElementById('sidebarOverlay');
+  const isMobile=window.innerWidth<=768;
+  if(isMobile){
+    sb.classList.toggle('open');
+    overlay.classList.toggle('show');
+    toggle.classList.toggle('open');
+    toggle.textContent=sb.classList.contains('open')?'✕':'☰';
+  } else {
+    sb.classList.toggle('collapsed');
+    mc.classList.toggle('sidebar-collapsed');
+    nav.classList.toggle('sidebar-collapsed');
+    toggle.classList.toggle('collapsed');
+    toggle.textContent=sb.classList.contains('collapsed')?'☰':'✕';
+  }
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+  document.getElementById('sidebarToggle').classList.remove('open');
+  document.getElementById('sidebarToggle').textContent='☰';
+}
+function setSidebarActive(id){
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
+  if(window.innerWidth<=768) closeSidebar();
+}
+function updateSidebarUser(){
+  if(!currentUser){
+    document.getElementById('sb-login-area').style.display='';
+    document.getElementById('sb-user-area').style.display='none';
+    document.getElementById('sl-dashboard') && (document.getElementById('sl-dashboard').style.display='none');
+    document.getElementById('sl-admin') && (document.getElementById('sl-admin').style.display='none');
+    return;
+  }
+  document.getElementById('sb-login-area').style.display='none';
+  document.getElementById('sb-user-area').style.display='';
+  document.getElementById('sb-avatar').src=currentUser.avatar
+    ?`https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png?size=64`
+    :`https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById('sb-name').textContent=currentUser.username;
+  document.getElementById('sb-role').textContent=currentUser.isAdmin?'⚙ Administrateur':'Aventurier';
+  const dashLink=document.getElementById('sl-dashboard');
+  if(dashLink) dashLink.style.display='';
+  if(currentUser.isAdmin){
+    const adminLink=document.getElementById('sl-admin');
+    if(adminLink) adminLink.style.display='';
+  }
+}
+addEventListener('resize',()=>{
+  const isMobile=window.innerWidth<=768;
+  const sb=document.getElementById('sidebar');
+  if(!isMobile){
+    sb.classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+    document.getElementById('sidebarToggle').textContent=sb.classList.contains('collapsed')?'☰':'✕';
+  } else {
+    document.getElementById('sidebarToggle').textContent='☰';
+  }
+});
 
 // ── RÉSERVATION DEPUIS LE SITE ────────────────────────────────────────────────
 let resaCats = [];
@@ -1213,5 +1368,6 @@ initUser();
 loadHome();
 setTimeout(initResa, 500);
 </script>
+</div><!-- end main-content -->
 </body>
 </html>
