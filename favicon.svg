@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Outer gold ring -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#C8921A" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="27" fill="none" stroke="#E8B830" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Compass points -->
+  <polygon points="32,2 34,8 32,6 30,8" fill="#D4A020"/>
+  <polygon points="32,62 34,56 32,58 30,56" fill="#D4A020"/>
+  <polygon points="2,32 8,34 6,32 8,30" fill="#D4A020"/>
+  <polygon points="62,32 56,34 58,32 56,30" fill="#D4A020"/>
+
+  <!-- Diagonal ornaments -->
+  <circle cx="10" cy="10" r="1.2" fill="#C8921A" opacity="0.7"/>
+  <circle cx="54" cy="10" r="1.2" fill="#C8921A" opacity="0.7"/>
+  <circle cx="10" cy="54" r="1.2" fill="#C8921A" opacity="0.7"/>
+  <circle cx="54" cy="54" r="1.2" fill="#C8921A" opacity="0.7"/>
+
+  <!-- Green glow background for S -->
+  <ellipse cx="32" cy="32" r="16" fill="#1A4010" opacity="0.4"/>
+
+  <!-- S shape — top arc (curves left→right) -->
+  <path d="M32 16 C22 16 17 20 17 25 C17 30 23 32 32 32"
+        fill="none" stroke="#2A8010" stroke-width="5" stroke-linecap="round"/>
+  <path d="M32 16 C22 16 17 20 17 25 C17 30 23 32 32 32"
+        fill="none" stroke="#60D830" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M32 16 C22 16 17 20 17 25 C17 30 23 32 32 32"
+        fill="none" stroke="#A8F060" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- S shape — bottom arc (curves right→left) -->
+  <path d="M32 32 C41 32 47 34 47 39 C47 44 42 48 32 48"
+        fill="none" stroke="#2A8010" stroke-width="5" stroke-linecap="round"/>
+  <path d="M32 32 C41 32 47 34 47 39 C47 44 42 48 32 48"
+        fill="none" stroke="#60D830" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M32 32 C41 32 47 34 47 39 C47 44 42 48 32 48"
+        fill="none" stroke="#A8F060" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- End dots of S -->
+  <circle cx="32" cy="16" r="2.5" fill="#60D830"/>
+  <circle cx="32" cy="16" r="1.2" fill="#C8F890"/>
+  <circle cx="32" cy="48" r="2.5" fill="#60D830"/>
+  <circle cx="32" cy="48" r="1.2" fill="#C8F890"/>
+</svg>
