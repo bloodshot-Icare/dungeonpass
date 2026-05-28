@@ -215,6 +215,32 @@ nav {
   white-space: nowrap;
 }
 .btn-discord:hover { filter: brightness(1.15); }
+.btn-login {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gold); color: #1a0a00;
+  padding: 7px 14px; border-radius: var(--r);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  border: none; cursor: pointer; white-space: nowrap; transition: filter .2s;
+}
+.btn-login:hover { filter: brightness(1.12); }
+.user-badge {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--gold2); font-size: 0.8rem; font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; letter-spacing: 0.06em;
+}
+.user-badge img { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); }
+#toast-notif {
+  position: fixed; bottom: 1.4rem; right: 1.4rem; z-index: 99999;
+  display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+}
+.toast-item {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.75rem 1.1rem; font-size: 0.88rem; font-family: 'Rajdhani', sans-serif;
+  font-weight: 600; color: var(--text); box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  animation: toastIn .25s ease; pointer-events: all;
+}
+@keyframes toastIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
 .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; margin-left: 1rem; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--textm); border-radius: 2px; }
 .mobile-menu {
@@ -563,16 +589,25 @@ nav {
 }
 .dj-img-wrap {
   position: relative;
-  aspect-ratio: 16/9;
+  aspect-ratio: 4/3;
   overflow: hidden;
-  background: linear-gradient(135deg, #0d1020, #151d30);
+  background: radial-gradient(ellipse at center, #1a2040 0%, #0a0d1a 100%);
 }
 .dj-img-wrap img {
   width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
+  object-fit: contain;
+  object-position: center;
+  image-rendering: auto;
+  /* lissage haute qualité navigateur */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  filter: contrast(1.08) saturate(1.1) brightness(1.02);
+  transition: transform 0.3s, filter 0.3s;
 }
-.dj-card:hover .dj-img-wrap img { transform: scale(1.06); }
+.dj-card:hover .dj-img-wrap img {
+  filter: contrast(1.12) saturate(1.18) brightness(1.05);
+}
+.dj-card:hover .dj-img-wrap img { transform: scale(1.04); }
 .dj-img-placeholder {
   width: 100%; height: 100%;
   display: flex;
@@ -883,6 +918,163 @@ footer a { color: var(--gold); text-decoration: none; }
   .podium-wrap { gap: 0.6rem; }
   .podium-plinth { min-width: 100px; }
 }
+
+/* ═══════════════════════════════════
+   PROFIL PAGE
+═══════════════════════════════════ */
+#page-profil { display: none; }
+.profile-hero {
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 2rem; display: flex; align-items: center; gap: 1.5rem;
+  margin-bottom: 1.5rem; position: relative; overflow: hidden;
+}
+.profile-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(212,160,23,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.profile-av {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid var(--gold2); box-shadow: 0 0 20px rgba(212,160,23,0.3);
+  object-fit: cover; flex-shrink: 0; background: var(--card2);
+}
+.profile-av-placeholder {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid var(--gold2); background: var(--card2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--gold2);
+  flex-shrink: 0;
+}
+.profile-info { flex: 1; min-width: 0; position: relative; z-index: 1; }
+.profile-name {
+  font-family: 'Rajdhani', sans-serif; font-size: 1.6rem; font-weight: 700;
+  color: var(--text); letter-spacing: 0.05em; text-transform: uppercase;
+}
+.profile-rang-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 3px; margin-top: 4px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  background: rgba(212,160,23,0.1); border: 1px solid rgba(212,160,23,0.25); color: var(--gold);
+  transition: all 0.3s;
+}
+.profile-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.profile-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 1.2rem 1.4rem;
+}
+.profile-card-title {
+  font-family: 'Rajdhani', sans-serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--textd); margin-bottom: 0.8rem;
+}
+.profile-stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem;
+}
+.profile-stat-row:last-child { border-bottom: none; }
+.profile-stat-row .label { color: var(--textm); }
+.profile-stat-row .value { font-weight: 600; color: var(--text); }
+.fid-bar-wrap { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+.fid-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold2), var(--gold3)); transition: width 0.4s ease; }
+.fid-remise-banner {
+  background: linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.05));
+  border: 1px solid rgba(212,160,23,0.4); border-radius: var(--r);
+  padding: 0.9rem 1.2rem; text-align: center; color: var(--gold2);
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.05em;
+  margin-top: 0.8rem; animation: pulse-gold 2s ease-in-out infinite;
+}
+@keyframes pulse-gold { 0%,100%{box-shadow:0 0 8px rgba(212,160,23,0.2);} 50%{box-shadow:0 0 20px rgba(212,160,23,0.4);} }
+.profile-history { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.profile-history-header {
+  padding: 0.9rem 1.2rem; background: var(--bg2); border-bottom: 1px solid var(--border);
+  font-family: 'Rajdhani', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--textm);
+}
+.hist-table { width: 100%; border-collapse: collapse; }
+.hist-table td { padding: 0.65rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.82rem; }
+.hist-table tbody tr:last-child td { border-bottom: none; }
+.hist-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ═══════════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════════ */
+#page-admin { display: none; }
+.admin-tabs { display: flex; gap: 0.3rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.admin-tab {
+  padding: 7px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--textm); font-family: 'Rajdhani', sans-serif; font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+}
+.admin-tab:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.admin-tab.active { background: rgba(212,160,23,0.1); border-color: rgba(212,160,23,0.35); color: var(--gold2); }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+.admin-toolbar { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.admin-select {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.85rem;
+  padding: 7px 12px; outline: none; cursor: pointer; min-width: 200px;
+}
+.admin-input {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.85rem;
+  padding: 7px 12px; outline: none; min-width: 120px; transition: border-color 0.2s;
+}
+.admin-input:focus { border-color: rgba(212,160,23,0.4); }
+.admin-btn {
+  padding: 6px 12px; border-radius: var(--r);
+  font-family: 'Rajdhani', sans-serif; font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer;
+  transition: filter 0.2s, opacity 0.2s; white-space: nowrap;
+}
+.admin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.admin-btn-gold { background: var(--gold); color: #1a0a00; }
+.admin-btn-gold:hover:not(:disabled) { filter: brightness(1.12); }
+.admin-btn-green { background: rgba(62,207,110,0.15); color: var(--green); border: 1px solid rgba(62,207,110,0.3); }
+.admin-btn-green:hover:not(:disabled) { background: rgba(62,207,110,0.25); }
+.admin-btn-red { background: rgba(224,80,80,0.15); color: var(--red); border: 1px solid rgba(224,80,80,0.3); }
+.admin-btn-red:hover:not(:disabled) { background: rgba(224,80,80,0.25); }
+.admin-btn-blue { background: rgba(96,165,250,0.15); color: var(--blue); border: 1px solid rgba(96,165,250,0.3); }
+.admin-btn-blue:hover:not(:disabled) { background: rgba(96,165,250,0.25); }
+.admin-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden;
+}
+.admin-table thead tr { background: var(--bg2); border-bottom: 1px solid var(--border); }
+.admin-table th {
+  padding: 0.7rem 1rem; font-family: 'Rajdhani', sans-serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--textm); text-align: left;
+}
+.admin-table td { padding: 0.6rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.83rem; vertical-align: middle; }
+.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.admin-table .actions { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+.admin-inline-input {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-size: 0.82rem; padding: 4px 8px; width: 90px; outline: none;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+}
+.admin-inline-input:focus { border-color: rgba(212,160,23,0.4); }
+.admin-inline-input.wide { width: 150px; }
+.admin-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.admin-stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r2); padding: 1.2rem; text-align: center; }
+.admin-stat-num { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; color: var(--gold2); line-height: 1; }
+.admin-stat-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--textm); margin-top: 4px; }
+.toggle-badge {
+  display: inline-flex; padding: 2px 8px; border-radius: 3px; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; user-select: none;
+}
+.toggle-badge.on { background: rgba(62,207,110,0.12); color: var(--green); border: 1px solid rgba(62,207,110,0.25); }
+.toggle-badge.off { background: rgba(255,255,255,0.04); color: var(--textm); border: 1px solid var(--border); }
+.rank-color-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
+.admin-cat-label {
+  font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--gold2); font-size: 0.95rem;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.podium-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -907,10 +1099,12 @@ footer a { color: var(--gold); text-decoration: none; }
   <ul class="nav-links">
     <li><a href="#" onclick="showPage('donjons')" id="nav-donjons" class="active"><span class="nav-icon">⚔</span> Voir les Donjons</a></li>
     <li><a href="#" onclick="showPage('classement')" id="nav-classement"><span class="nav-icon">🏆</span> Classement</a></li>
-    <li><a href="#" onclick="showPage('succes')" id="nav-succes"><span class="nav-icon">🏅</span> Succès</a></li>
+    <li id="nav-li-profil" style="display:none;"><a href="#" onclick="showPage('profil')" id="nav-profil"><span class="nav-icon">👤</span> Mon Profil</a></li>
+    <li id="nav-li-admin" style="display:none;"><a href="#" onclick="showPage('admin')" id="nav-admin"><span class="nav-icon">🛡️</span> Admin</a></li>
     <li><a href="#" onclick="showPage('equipe')" id="nav-equipe"><span class="nav-icon">⚜</span> L'Équipe</a></li>
   </ul>
   <div class="nav-right">
+    <div id="nav-user-area"></div>
     <a class="btn-discord" href="https://discord.gg/votre-lien" target="_blank" rel="noopener">
       <svg width="16" height="12" viewBox="0 0 24 18" fill="currentColor"><path d="M20.317 1.492A19.825 19.825 0 0015.37.15a.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.249a18.27 18.27 0 00-5.487 0A12.5 12.5 0 008.583.188a.077.077 0 00-.079-.037A19.736 19.736 0 003.677 1.49a.07.07 0 00-.032.027C.533 6.093-.32 10.555.099 14.961a.08.08 0 00.031.055 19.926 19.926 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.995a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
       Discord
@@ -925,7 +1119,8 @@ footer a { color: var(--gold); text-decoration: none; }
 <div class="mobile-menu" id="mobileMenu">
   <a href="#" onclick="showPage('donjons');toggleMenu()">⚔ Donjons</a>
   <a href="#" onclick="showPage('classement');toggleMenu()">🏆 Classement</a>
-  <a href="#" onclick="showPage('succes');toggleMenu()">🏅 Succès</a>
+  <a href="#" id="mob-profil" style="display:none;" onclick="showPage('profil');toggleMenu()">👤 Mon Profil</a>
+  <a href="#" id="mob-admin" style="display:none;" onclick="showPage('admin');toggleMenu()">🛡️ Admin</a>
   <a href="#" onclick="showPage('equipe');toggleMenu()">⚜ L'Équipe</a>
   <a class="btn-discord" href="https://discord.gg/votre-lien" target="_blank">Discord</a>
 </div>
@@ -1014,90 +1209,99 @@ footer a { color: var(--gold); text-decoration: none; }
   <div class="content-area" id="page-equipe">
     <div class="content-section-title">
       <h2>L'Équipe</h2>
-      <span class="cat-tag">⚜ Passeur</span>
+      <span class="cat-tag">⚜ Passeurs</span>
     </div>
-    <div class="team-card">
-      <div class="team-banner"></div>
-      <div class="team-body">
-        <div class="team-avatar" id="teamAvatar">BR</div>
-        <div class="team-name">Bridloxx</div>
-        <div class="team-role">Passeur Principal — Serveur HELL MINA</div>
-        <p class="team-bio">
-          Passeur expérimenté sur Serveur HELL MINA, je propose des passages de donjons clés en main pour tous les niveaux.
-          Prix fixes et transparents, disponible tous les jours, réponse rapide sur Discord.
-        </p>
-        <div class="team-stats">
-          <div class="team-stat"><div class="team-stat-num" id="team-passages">—</div><div class="team-stat-label">Passages validés</div></div>
-          <div class="team-stat"><div class="team-stat-num" id="team-joueurs">—</div><div class="team-stat-label">Aventuriers</div></div>
-          <div class="team-stat"><div class="team-stat-num" id="team-donjons">—</div><div class="team-stat-label">Donjons dispo.</div></div>
-        </div>
-        <ul class="team-features">
-          <li>Prix fixes et transparents, annoncés avant chaque passage</li>
-          <li>Remise de -50% tous les 3 passages cumulés</li>
-          <li>Système de fidélité avec classement et rangs Discord</li>
-          <li>Ticket Discord dédié pour chaque passage</li>
-          <li>Disponible tous les jours, réponse rapide</li>
-        </ul>
-        <div style="margin-top:1.5rem;">
-          <a class="btn-primary" href="https://discord.gg/votre-lien" target="_blank" rel="noopener">Contacter via Discord</a>
-        </div>
-      </div>
+    <div id="teamGrid" style="display:flex;flex-direction:column;gap:1.5rem;max-width:700px;margin:0 auto;">
+      <div style="text-align:center;padding:3rem;color:var(--textd);"><span class="spinner"></span> Chargement...</div>
     </div>
   </div>
 </div>
 
-  <!-- PAGE SUCCÈS -->
-  <div class="content-area" id="page-succes" style="display:none">
+  <!-- PAGE PROFIL -->
+  <div class="content-area" id="page-profil">
     <div class="content-section-title">
-      <h2>Succès de Donjon</h2>
-      <span class="cat-tag">🏅 Achievements</span>
+      <h2>Mon Profil</h2>
+      <span class="cat-tag">👤 Aventurier</span>
     </div>
-
-    <!-- Filtres succès -->
-    <div class="search-bar" style="margin-bottom:1.2rem;">
-      <div class="search-input-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="search-input" type="text" placeholder="Rechercher un succès..." id="succesSearch" oninput="filterSucces()">
-      </div>
-      <select class="sort-select" id="succesVague" onchange="filterSucces()">
-        <option value="">Toutes les vagues</option>
-        <option value="1">1ère vague</option>
-        <option value="2">2ème vague</option>
-        <option value="3">Dernière vague</option>
-      </select>
-      <select class="sort-select" id="succesDonjon" onchange="filterSucces()">
-        <option value="">Tous les donjons</option>
-      </select>
-      <span class="results-info" id="succesInfo"></span>
+    <div id="profil-content">
+      <div style="text-align:center;padding:3rem;color:var(--textd);"><span class="spinner"></span> Chargement...</div>
     </div>
-
-    <!-- Compteurs par vague -->
-    <div style="display:flex;gap:0.7rem;margin-bottom:1.4rem;flex-wrap:wrap;">
-      <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0.8rem 1rem;text-align:center;">
-        <div style="font-size:1.4rem;font-weight:700;color:var(--gold2)" id="succes-count-1">—</div>
-        <div style="font-size:0.72rem;color:var(--textm);margin-top:2px;">1ère vague</div>
-      </div>
-      <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0.8rem 1rem;text-align:center;">
-        <div style="font-size:1.4rem;font-weight:700;color:var(--gold2)" id="succes-count-2">—</div>
-        <div style="font-size:0.72rem;color:var(--textm);margin-top:2px;">2ème vague</div>
-      </div>
-      <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0.8rem 1rem;text-align:center;">
-        <div style="font-size:1.4rem;font-weight:700;color:var(--gold2)" id="succes-count-3">—</div>
-        <div style="font-size:0.72rem;color:var(--textm);margin-top:2px;">Dernière vague</div>
-      </div>
-      <div style="flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0.8rem 1rem;text-align:center;">
-        <div style="font-size:1.4rem;font-weight:700;color:var(--gold)" id="succes-count-total">—</div>
-        <div style="font-size:0.72rem;color:var(--textm);margin-top:2px;">Total</div>
-      </div>
-    </div>
-
-    <!-- Grille succès -->
-    <div id="succesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;"></div>
-    <div id="succesEmpty" style="display:none;text-align:center;padding:3rem;color:var(--textm);">Aucun succès trouvé.</div>
   </div>
 
-</div>
+  <!-- PAGE ADMIN -->
+  <div class="content-area" id="page-admin">
+    <div class="content-section-title">
+      <h2>Panel Administration</h2>
+      <span class="cat-tag">🛡️ Admin</span>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="adminTab('dashboard')">📊 Dashboard</button>
+      <button class="admin-tab" onclick="adminTab('donjons')">⚔️ Donjons</button>
+      <button class="admin-tab" onclick="adminTab('options')">🏅 Options</button>
+      <button class="admin-tab" onclick="adminTab('rangs')">🎖️ Rangs</button>
+      <button class="admin-tab" onclick="adminTab('joueurs')">👥 Joueurs</button>
+      <button class="admin-tab" onclick="adminTab('passages')">📜 Passages</button>
+      <button class="admin-tab" onclick="adminTab('equipe')">⚜ Équipe</button>
+    </div>
 
+    <!-- Dashboard -->
+    <div id="admin-dashboard" class="admin-section active">
+      <div class="admin-stats-grid" id="adminStatsGrid">
+        <div class="admin-stat-card"><div class="admin-stat-num">—</div><div class="admin-stat-label">⚔️ Passages</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-num">—</div><div class="admin-stat-label">👥 Joueurs</div></div>
+      </div>
+      <div class="content-section-title" style="margin-top:0.5rem;"><h2>Derniers Passages</h2></div>
+      <div id="adminDashPassages"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+
+    <!-- Donjons -->
+    <div id="admin-donjons" class="admin-section">
+      <div class="admin-toolbar">
+        <select class="admin-select" id="adminDonjonCatFilter" onchange="adminRenderDonjons()">
+          <option value="all">Toutes les catégories</option>
+        </select>
+        <button class="admin-btn admin-btn-gold" onclick="adminShowAddDonjon()">+ Ajouter un donjon</button>
+      </div>
+      <div id="adminDonjonsContent"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+
+    <!-- Options -->
+    <div id="admin-options" class="admin-section">
+      <div class="admin-toolbar">
+        <select class="admin-select" id="adminOptionsDonjon" onchange="adminLoadOptions()">
+          <option value="">— Sélectionner un donjon —</option>
+        </select>
+        <button class="admin-btn admin-btn-gold" onclick="adminShowAddOption()">+ Ajouter une option</button>
+      </div>
+      <div id="adminOptionsContent"></div>
+    </div>
+
+    <!-- Rangs -->
+    <div id="admin-rangs" class="admin-section">
+      <div class="admin-toolbar">
+        <button class="admin-btn admin-btn-gold" onclick="adminShowAddRang()">+ Ajouter un rang</button>
+      </div>
+      <div id="adminRangsContent"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+
+    <!-- Joueurs -->
+    <div id="admin-joueurs" class="admin-section">
+      <div id="adminJoueursContent"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+
+    <!-- Passages -->
+    <div id="admin-passages" class="admin-section">
+      <div id="adminPassagesContent"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+
+    <!-- Équipe -->
+    <div id="admin-equipe" class="admin-section">
+      <div class="admin-toolbar">
+        <button class="admin-btn admin-btn-gold" onclick="adminShowAddMembre()">+ Ajouter un passeur</button>
+      </div>
+      <div id="adminEquipeContent"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
+    </div>
+  </div>
 
 <!-- FOOTER -->
 <footer>
@@ -1113,11 +1317,98 @@ footer a { color: var(--gold); text-decoration: none; }
 /* ═════════════════════════════════
    CONFIG
 ═════════════════════════════════ */
-const API = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+const API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '')
   ? 'http://localhost:3001'
   : 'https://bloodshot-icare-dofus-bot-passage-production.up.railway.app';
 const DISCORD = 'https://discord.gg/votre-lien';
 const PASSAGES_AVANT_REMISE = 3;
+
+/* ═════════════════════════════════
+   AUTH DISCORD
+═════════════════════════════════ */
+let authToken = null;
+let currentUser = null;
+
+function showToast(msg, duration) {
+  const container = document.getElementById('toast-notif');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .4s'; setTimeout(() => el.remove(), 400); }, duration || 3500);
+}
+
+function loginDiscord() {
+  window.location.href = API + '/api/auth/discord';
+}
+
+function logoutDiscord() {
+  authToken = null; currentUser = null;
+  localStorage.removeItem('dp_token');
+  renderUserArea();
+}
+
+function renderUserArea() {
+  const area = document.getElementById('nav-user-area');
+  if (!area) return;
+  // Afficher/masquer liens nav profil et admin
+  const showProfil = !!(authToken && currentUser);
+  const showAdmin  = !!(authToken && currentUser && currentUser.isAdmin);
+  const liProfil = document.getElementById('nav-li-profil');
+  const liAdmin  = document.getElementById('nav-li-admin');
+  const mobProfil = document.getElementById('mob-profil');
+  const mobAdmin  = document.getElementById('mob-admin');
+  if (liProfil)  liProfil.style.display  = showProfil ? '' : 'none';
+  if (liAdmin)   liAdmin.style.display   = showAdmin  ? '' : 'none';
+  if (mobProfil) mobProfil.style.display = showProfil ? '' : 'none';
+  if (mobAdmin)  mobAdmin.style.display  = showAdmin  ? '' : 'none';
+
+  if (authToken && currentUser) {
+    const avatar = currentUser.avatar
+      ? 'https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png'
+      : null;
+    const avHtml = avatar
+      ? '<img src="' + avatar + '" onerror="this.style.display=&quot;none&quot;">'
+      : '<span style="width:26px;height:26px;border-radius:50%;background:var(--card2);display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:var(--gold2);">' + esc(currentUser.username.slice(0,2).toUpperCase()) + '</span>';
+    area.innerHTML = '<div class="user-badge" onclick="showPage(\'profil\')" style="cursor:pointer;" title="Mon profil">'
+      + avHtml
+      + '<span>' + esc(currentUser.username) + '</span>'
+      + (currentUser.isAdmin ? '<span style="color:var(--purple);font-size:0.65rem;">🛡️</span>' : '')
+      + '<button onclick="event.stopPropagation();logoutDiscord()" title="Se déconnecter" style="background:none;border:none;color:var(--textm);cursor:pointer;font-size:0.85rem;padding:2px 4px;">✕</button>'
+      + '</div>';
+  } else {
+    area.innerHTML = '<button class="btn-login" onclick="loginDiscord()">🎮 Se connecter</button>';
+  }
+}
+
+(function initAuth() {
+  // Récupérer token depuis URL (?token=...)
+  const params = new URLSearchParams(location.search);
+  const urlToken = params.get('token');
+  if (urlToken) {
+    authToken = urlToken;
+    localStorage.setItem('dp_token', urlToken);
+    // Nettoyer l'URL
+    const url = new URL(location.href);
+    url.searchParams.delete('token');
+    history.replaceState(null, '', url.toString());
+  } else {
+    authToken = localStorage.getItem('dp_token') || null;
+  }
+  if (authToken) {
+    // Décoder le JWT (sans vérifier la signature)
+    try {
+      const payload = JSON.parse(atob(authToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        authToken = null; localStorage.removeItem('dp_token');
+      } else {
+        currentUser = payload;
+      }
+    } catch(_) { authToken = null; localStorage.removeItem('dp_token'); }
+  }
+  renderUserArea();
+})();
 
 /* ═════════════════════════════════
    MAPPING IMAGE DONJON
@@ -1178,16 +1469,23 @@ function esc(s) {
    NAVIGATION PAGES
 ═════════════════════════════════ */
 let currentPage = 'donjons';
+const FULLWIDTH_PAGES = ['profil','admin'];
 function showPage(page) {
-  ['donjons','classement','succes','equipe'].forEach(p => {
-    document.getElementById('page-' + p).style.display = p === page ? 'block' : 'none';
+  ['donjons','classement','equipe','profil','admin'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.style.display = p === page ? 'block' : 'none';
     const navEl = document.getElementById('nav-' + p);
     if (navEl) navEl.classList.toggle('active', p === page);
   });
   document.getElementById('heroBanner').style.display = page === 'donjons' ? '' : 'none';
+  // Masquer le main-layout (sidebar) pour les pages pleine largeur
+  const ml = document.querySelector('.main-layout');
+  if (ml) ml.style.display = FULLWIDTH_PAGES.includes(page) ? 'none' : 'flex';
   currentPage = page;
   if (page === 'classement' && !lbLoaded) loadLeaderboard();
-  if (page === 'succes' && !succesLoaded) loadSucces();
+  if (page === 'equipe') loadTeam();
+  if (page === 'profil') loadProfile();
+  if (page === 'admin') adminTab('dashboard');
   return false;
 }
 showPage('donjons');
@@ -1201,8 +1499,6 @@ let currentCat = 'all';
 let currentSort = 'default';
 let currentSearch = '';
 let lbLoaded = false;
-let succesLoaded = false;
-let allSucces = [];
 
 /* ═════════════════════════════════
    STATS
@@ -1211,11 +1507,10 @@ async function loadStats() {
   try {
     const r = await fetch(API + '/api/stats');
     const d = await r.json();
-    document.getElementById('stat-passages').textContent = d.totalPassages;
-    document.getElementById('stat-joueurs').textContent = d.totalJoueurs;
-    document.getElementById('stat-today').textContent = d.passagesAujourdhui;
-    document.getElementById('team-passages').textContent = d.totalPassages;
-    document.getElementById('team-joueurs').textContent = d.totalJoueurs;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('stat-passages', d.totalPassages);
+    set('stat-joueurs', d.totalJoueurs);
+    set('stat-today', d.passagesAujourdhui);
   } catch(e) {}
 }
 
@@ -1233,7 +1528,7 @@ async function loadServices() {
       });
     });
     document.getElementById('count-all').textContent = allDonjons.length;
-    document.getElementById('team-donjons').textContent = allDonjons.length;
+    document.querySelectorAll('[id="team-donjons"]').forEach(el => el.textContent = allDonjons.length);
     // Sidebar catégories
     const sidebar = document.getElementById('sidebar').querySelector('.sidebar-section');
     allCats.forEach(cat => {
@@ -1281,7 +1576,7 @@ function renderDonjons() {
     const img = getDjImg(d.nom);
     const prix = d.prix > 0 ? fmtK(d.prix) : null;
     const card = document.createElement('div');
-    card.className = 'dj-card';
+    card.className = 'dj-card'; card.style.cursor='pointer'; card.onclick = function(e){ if(!e.target.closest('.dj-ticket-btn')) openOptionsModal(d); };
     card.innerHTML =
       '<div class="dj-img-wrap">'
       + (img
@@ -1351,15 +1646,21 @@ async function loadLeaderboard() {
     order.forEach(p => {
       const pos = players.indexOf(p) + 1;
       const init = p.username.slice(0,2).toUpperCase();
+      const avatarUrl = p.avatar ? 'https://cdn.discordapp.com/avatars/' + p.id + '/' + p.avatar + '.png' : null;
+      const avHtml = avatarUrl
+        ? '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML=\'<span>' + esc(init) + '</span>\'">'
+        : esc(init);
+      const rangNom = p.rang ? p.rang.nom : '—';
+      const rangColor = p.rang ? ('#' + Number(p.rang.couleur).toString(16).padStart(6,'0')) : 'var(--gold)';
       const div = document.createElement('div');
       div.className = 'podium-item';
       div.innerHTML =
         '<div class="podium-plinth podium-plinth-' + pos + '">'
         + '<div class="podium-rank podium-rank-' + pos + '">' + pos + '</div>'
-        + '<div class="podium-av">' + esc(init) + '</div>'
+        + '<div class="podium-av">' + avHtml + '</div>'
         + '<div class="podium-uname">' + esc(p.username) + '</div>'
         + '<div class="podium-info">' + p.total_passages + ' passages</div>'
-        + '<div class="podium-rang-tag">' + esc(p.rang ? p.rang.nom : '—') + '</div>'
+        + '<div class="podium-rang-tag" style="color:' + rangColor + ';border-color:' + rangColor + '40;background:' + rangColor + '15;">' + esc(rangNom) + '</div>'
         + '</div>'
         + '<div class="podium-base podium-base-' + pos + '"></div>';
       pw.appendChild(div);
@@ -1372,11 +1673,17 @@ async function loadLeaderboard() {
       const rank = i + 4;
       const pos = p.fidelite ? (PASSAGES_AVANT_REMISE - p.fidelite.passagesRestants) : 0;
       const pct = Math.max(0, Math.min(100, (pos / PASSAGES_AVANT_REMISE) * 100));
+      const avatarUrl = p.avatar ? 'https://cdn.discordapp.com/avatars/' + p.id + '/' + p.avatar + '.png' : null;
+      const avSmall = avatarUrl
+        ? '<img src="' + avatarUrl + '" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;object-fit:cover;" onerror="this.style.display=\'none\'">'
+        : '<span style="width:26px;height:26px;border-radius:50%;background:var(--card2);display:inline-flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--gold2);flex-shrink:0;">' + esc(p.username.slice(0,2).toUpperCase()) + '</span>';
+      const rangNom = p.rang ? p.rang.nom : '—';
+      const rangColor = p.rang ? ('#' + Number(p.rang.couleur).toString(16).padStart(6,'0')) : 'var(--gold)';
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td><span class="lb-rank">#' + rank + '</span></td>'
-        + '<td><span class="lb-name">' + esc(p.username) + '</span></td>'
-        + '<td><span class="lb-rang-tag">' + esc(p.rang ? p.rang.nom : '—') + '</span></td>'
+        + '<td><div style="display:flex;align-items:center;gap:8px;">' + avSmall + '<span class="lb-name">' + esc(p.username) + '</span></div></td>'
+        + '<td><span class="lb-rang-tag" style="color:' + rangColor + ';border-color:' + rangColor + '40;background:' + rangColor + '15;">' + esc(rangNom) + '</span></td>'
         + '<td><span class="lb-passages">' + p.total_passages + '</span></td>'
         + '<td><div class="lb-fid"><div class="lb-bar"><div class="lb-bar-fill" style="width:' + pct + '%"></div></div><span>' + pos + '/' + PASSAGES_AVANT_REMISE + '</span></div></td>';
       tbody.appendChild(tr);
@@ -1411,93 +1718,6 @@ async function loadTicker() {
 }
 
 /* ═════════════════════════════════
-   SUCCÈS
-═════════════════════════════════ */
-async function loadSucces() {
-  succesLoaded = true;
-  try {
-    const r = await fetch(API + '/api/succes?actif=1');
-    allSucces = await r.json();
-
-    // Compteurs par vague
-    [1,2,3].forEach(v => {
-      const el = document.getElementById('succes-count-' + v);
-      if (el) el.textContent = allSucces.filter(s => s.vague === v).length;
-    });
-    const totEl = document.getElementById('succes-count-total');
-    if (totEl) totEl.textContent = allSucces.length;
-
-    // Remplir filtre donjons
-    const djSet = {};
-    allSucces.forEach(s => {
-      if (s.donjon_id && s.donjon_nom) djSet[s.donjon_id] = s.donjon_nom;
-    });
-    const djSel = document.getElementById('succesDonjon');
-    Object.entries(djSet).sort((a,b) => a[1].localeCompare(b[1])).forEach(([id, nom]) => {
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.textContent = nom;
-      djSel.appendChild(opt);
-    });
-
-    renderSucces();
-  } catch(e) {
-    document.getElementById('succesGrid').innerHTML = '<p style="color:var(--textd);padding:2rem;">Impossible de charger les succès.</p>';
-  }
-}
-
-function filterSucces() {
-  renderSucces();
-}
-
-function renderSucces() {
-  const q       = (document.getElementById('succesSearch').value || '').toLowerCase().trim();
-  const vague   = parseInt(document.getElementById('succesVague').value) || 0;
-  const donjonId = parseInt(document.getElementById('succesDonjon').value) || 0;
-
-  let list = allSucces;
-  if (vague)    list = list.filter(s => s.vague === vague);
-  if (donjonId) list = list.filter(s => s.donjon_id === donjonId);
-  if (q)        list = list.filter(s => s.nom.toLowerCase().includes(q) || (s.donjon_nom||'').toLowerCase().includes(q));
-
-  const infoEl = document.getElementById('succesInfo');
-  if (infoEl) infoEl.textContent = list.length + ' succès';
-
-  const grid  = document.getElementById('succesGrid');
-  const empty = document.getElementById('succesEmpty');
-  if (!list.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  const VAGUE_LABEL = { 1: '1ère vague', 2: '2ème vague', 3: 'Dernière vague' };
-  const VAGUE_COLOR = { 1: 'var(--gold)', 2: '#7fc9ff', 3: '#ff9d6f' };
-
-  grid.innerHTML = list.map(s => {
-    const prixFmt = s.donjon_id && s.prix > 0
-      ? String(s.prix).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + '\u00a0\u20ad'
-      : s.donjon_id ? '<em style="color:var(--textd)">À définir</em>' : '';
-    const vagueLabel = VAGUE_LABEL[s.vague] || '';
-    const vagueColor = VAGUE_COLOR[s.vague] || 'var(--textm)';
-    const img = s.img_url
-      ? '<img src="' + esc(s.img_url) + '" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:contain;background:var(--bg2);padding:4px;" onerror="this.style.display=&quot;none&quot;">'
-      : '<div style="width:48px;height:48px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🏅</div>';
-    return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1rem;display:flex;gap:0.9rem;align-items:flex-start;transition:border-color .2s" onmouseover="this.style.borderColor=&quot;var(--gold)&quot;" onmouseout="this.style.borderColor=&quot;var(--border)&quot;">'
-      + img
-      + '<div style="flex:1;min-width:0;">'
-      + '<div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + esc(s.nom) + '">' + esc(s.nom) + '</div>'
-      + (s.donjon_nom ? '<div style="font-size:0.72rem;color:var(--textm);margin-top:2px;">🗡 ' + esc(s.donjon_nom) + '</div>' : '')
-      + (vagueLabel ? '<div style="font-size:0.7rem;color:' + vagueColor + ';margin-top:2px;font-weight:600;">' + vagueLabel + '</div>' : '')
-      + (s.points ? '<div style="font-size:0.7rem;color:var(--textd);margin-top:2px;">⭐ ' + s.points + ' pts</div>' : '')
-      + (prixFmt ? '<div style="font-size:0.8rem;color:var(--gold2);margin-top:4px;font-weight:700;">' + prixFmt + '</div>' : '')
-      + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-/* ═════════════════════════════════
    MENU MOBILE
 ═════════════════════════════════ */
 function toggleMenu() {
@@ -1509,6 +1729,695 @@ function toggleMenu() {
 loadStats();
 loadServices();
 loadTicker();
+
+/* ═════════════════════════════════
+   PROFIL
+═════════════════════════════════ */
+async function loadProfile() {
+  const container = document.getElementById('profil-content');
+  if (!container) return;
+  if (!authToken) {
+    container.innerHTML =
+      '<div style="text-align:center;padding:3rem;color:var(--textm);">'
+      + '<div style="font-size:2.5rem;margin-bottom:1rem;">🔐</div>'
+      + '<div style="margin-bottom:1rem;font-size:0.95rem;">Connecte-toi pour voir ton profil.</div>'
+      + '<button class="btn-login" onclick="loginDiscord()">🎮 Se connecter avec Discord</button>'
+      + '</div>';
+    return;
+  }
+  container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--textd);"><span class="spinner"></span> Chargement...</div>';
+  try {
+    const r = await fetch(API + '/api/me', { headers: { Authorization: 'Bearer ' + authToken } });
+    if (!r.ok) throw new Error('err');
+    const data = await r.json();
+    renderProfile(data);
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">Impossible de charger ton profil.</div>';
+  }
+}
+
+function renderProfile(data) {
+  const { user, fidelite, passages_recent, passages_avant_remise } = data;
+  const PA = passages_avant_remise || PASSAGES_AVANT_REMISE;
+  const avatarUrl = user.avatar ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png' : null;
+  const initials = user.username.slice(0,2).toUpperCase();
+  const avHtml = avatarUrl
+    ? '<img class="profile-av" src="' + avatarUrl + '" onerror="this.outerHTML=\'<div class=profile-av-placeholder>' + esc(initials) + '</div>\'">'
+    : '<div class="profile-av-placeholder">' + esc(initials) + '</div>';
+
+  const pos = fidelite.positionDansCycle || 0;
+  const pct = Math.round((pos / PA) * 100);
+
+  let fidHtml;
+  if (fidelite.estRemise) {
+    fidHtml = '<div class="fid-remise-banner">🎁 Ton prochain passage est à <strong>-50%</strong> !</div>';
+  } else {
+    fidHtml =
+      '<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--textm);margin-top:0.6rem;">'
+      + '<span>Progression fidélité</span>'
+      + '<span style="color:var(--gold2);font-weight:700;">' + pos + '/' + PA + '</span>'
+      + '</div>'
+      + '<div class="fid-bar-wrap"><div class="fid-bar-fill" style="width:' + pct + '%;"></div></div>'
+      + '<div style="font-size:0.75rem;color:var(--textm);text-align:right;">encore <strong style="color:var(--gold2);">'
+      + fidelite.passagesRestants + '</strong> passage' + (fidelite.passagesRestants > 1 ? 's' : '') + ' pour le -50%</div>';
+  }
+
+  const histRows = (passages_recent || []).map(p => {
+    const d = new Date(p.created_at);
+    const dateStr = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+    const remTag = p.est_remise ? ' <span style="color:var(--gold);font-size:0.7rem;font-weight:700;">-50%</span>' : '';
+    return '<tr>'
+      + '<td style="font-weight:600;">' + esc(p.donjon_nom || '?') + '</td>'
+      + '<td style="color:var(--textm);font-size:0.78rem;">' + esc(p.cat_nom || '?') + '</td>'
+      + '<td style="color:var(--gold2);font-weight:700;">' + (p.prix_paye > 0 ? fmtK(p.prix_paye) : 'Gratuit') + remTag + '</td>'
+      + '<td style="color:var(--textd);font-size:0.78rem;">' + dateStr + '</td>'
+      + '</tr>';
+  }).join('');
+
+  document.getElementById('profil-content').innerHTML =
+    '<div class="profile-hero">'
+    + avHtml
+    + '<div class="profile-info">'
+    + '<div class="profile-name">' + esc(user.username) + '</div>'
+    + '<div class="profile-rang-badge" id="profileRangBadge">⚔ Aventurier</div>'
+    + (user.isAdmin ? '<div style="margin-top:6px;font-size:0.7rem;color:var(--purple);font-weight:700;letter-spacing:0.1em;">🛡️ ADMINISTRATEUR</div>' : '')
+    + '</div>'
+    + '</div>'
+    + '<div class="profile-grid">'
+    + '<div class="profile-card">'
+    + '<div class="profile-card-title">Statistiques</div>'
+    + '<div class="profile-stat-row"><span class="label">Total passages</span><span class="value" style="color:var(--gold2);font-size:1.1rem;font-family:\'Rajdhani\',sans-serif;">' + user.total_passages + '</span></div>'
+    + '<div class="profile-stat-row"><span class="label">Remises -50% utilisées</span><span class="value">' + user.remises_utilisees + '</span></div>'
+    + '<div class="profile-stat-row"><span class="label">Statut</span><span class="value" style="color:var(--green);font-size:0.8rem;">' + (user.total_passages > 0 ? '✅ Actif' : '⏳ Nouveau') + '</span></div>'
+    + '</div>'
+    + '<div class="profile-card">'
+    + '<div class="profile-card-title">Programme Fidélité</div>'
+    + fidHtml
+    + '</div>'
+    + '</div>'
+    + '<div class="profile-history">'
+    + '<div class="profile-history-header">📜 Derniers Passages</div>'
+    + (histRows
+      ? '<table class="hist-table"><thead style="background:var(--bg2);border-bottom:1px solid var(--border);">'
+        + '<tr>'
+        + '<th style="padding:.5rem 1.2rem;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--textm);text-align:left;">Donjon</th>'
+        + '<th style="padding:.5rem 1.2rem;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--textm);text-align:left;">Catégorie</th>'
+        + '<th style="padding:.5rem 1.2rem;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--textm);text-align:left;">Prix payé</th>'
+        + '<th style="padding:.5rem 1.2rem;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--textm);text-align:left;">Date</th>'
+        + '</tr></thead><tbody>' + histRows + '</tbody></table>'
+      : '<div class="empty-state">Aucun passage enregistré.</div>')
+    + '</div>';
+
+  // Charger rang depuis l'API
+  fetch(API + '/api/ranks').then(r => r.json()).then(ranks => {
+    if (!ranks || !ranks.length) return;
+    let cur = ranks[0];
+    for (const rk of ranks) { if (user.total_passages >= rk.seuil) cur = rk; }
+    const badge = document.getElementById('profileRangBadge');
+    if (badge && cur) {
+      const hex = '#' + Number(cur.couleur).toString(16).padStart(6,'0');
+      badge.textContent = cur.nom;
+      badge.style.color = hex;
+      badge.style.borderColor = hex + '40';
+      badge.style.background = hex + '15';
+    }
+  }).catch(() => {});
+}
+
+/* ═════════════════════════════════
+   ADMIN PANEL
+═════════════════════════════════ */
+let adminCurrentTab = 'dashboard';
+let adminDonjonsData = [];
+
+function adminTab(tab) {
+  adminCurrentTab = tab;
+  const tabs = ['dashboard','donjons','options','rangs','joueurs','passages'];
+  document.querySelectorAll('.admin-tab').forEach((btn, i) => btn.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('admin-' + tab);
+  if (sec) sec.classList.add('active');
+  if (tab === 'dashboard') adminLoadDashboard();
+  else if (tab === 'donjons') adminLoadDonjons();
+  else if (tab === 'options') adminLoadOptionsSelectors();
+  else if (tab === 'rangs') adminLoadRangs();
+  else if (tab === 'joueurs') adminLoadJoueurs();
+  else if (tab === 'passages') adminLoadPassages();
+  else if (tab === 'equipe') adminLoadEquipe();
+}
+
+async function adminFetch(url, opts) {
+  return fetch(API + url, {
+    ...(opts || {}),
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken, ...((opts || {}).headers) }
+  });
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function adminLoadDashboard() {
+  try {
+    const [statsR, passR] = await Promise.all([
+      fetch(API + '/api/stats'),
+      adminFetch('/api/admin/passages'),
+    ]);
+    const stats = await statsR.json();
+    const passages = await passR.json();
+    document.getElementById('adminStatsGrid').innerHTML =
+      '<div class="admin-stat-card"><div class="admin-stat-num">' + (stats.totalPassages||0) + '</div><div class="admin-stat-label">⚔️ Passages Total</div></div>'
+      + '<div class="admin-stat-card"><div class="admin-stat-num">' + (stats.totalJoueurs||0) + '</div><div class="admin-stat-label">👥 Aventuriers</div></div>';
+    const rows = passages.slice(0,20).map(p => {
+      const d = new Date(p.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return '<tr>'
+        + '<td style="font-weight:600;">' + esc(p.username) + '</td>'
+        + '<td>' + esc(p.donjon_nom||'?') + '</td>'
+        + '<td style="color:var(--gold2);font-weight:700;">' + (p.prix_paye>0?fmtK(p.prix_paye):'—') + '</td>'
+        + '<td>' + (p.est_remise?'<span style="color:var(--gold);font-weight:700;font-size:0.78rem;">-50%</span>':'—') + '</td>'
+        + '<td style="color:var(--textm);font-size:0.78rem;">' + d + '</td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('adminDashPassages').innerHTML =
+      '<table class="admin-table"><thead><tr><th>Joueur</th><th>Donjon</th><th>Prix payé</th><th>Remise</th><th>Date</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--textd);">Aucun passage.</td></tr>') + '</tbody></table>';
+  } catch(e) {
+    document.getElementById('adminStatsGrid').innerHTML = '<div class="empty-state">Erreur de chargement.</div>';
+  }
+}
+
+// ── DONJONS ───────────────────────────────────────────────────────────────────
+async function adminLoadDonjons() {
+  try {
+    const r = await adminFetch('/api/admin/donjons');
+    adminDonjonsData = await r.json();
+    const sel = document.getElementById('adminDonjonCatFilter');
+    sel.innerHTML = '<option value="all">Toutes les catégories</option>'
+      + adminDonjonsData.map(c => '<option value="' + c.id + '">' + esc(c.emoji||'') + ' ' + esc(c.nom) + '</option>').join('');
+    adminRenderDonjons();
+  } catch(e) { document.getElementById('adminDonjonsContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
+
+function adminRenderDonjons() {
+  const catFilter = document.getElementById('adminDonjonCatFilter').value;
+  const cats = catFilter === 'all' ? adminDonjonsData : adminDonjonsData.filter(c => String(c.id) === catFilter);
+  let html = '';
+  for (const cat of cats) {
+    const rows = (cat.donjons||[]).map(d =>
+      '<tr>'
+      + '<td style="font-weight:600;">' + esc(d.nom) + '</td>'
+      + '<td><input class="admin-inline-input" type="number" value="' + d.prix + '" id="dprix_' + d.id + '" style="width:120px;"></td>'
+      + '<td><span class="toggle-badge ' + (d.actif?'on':'off') + '" id="dtoggle_' + d.id + '" onclick="adminToggleDonjon(' + d.id + ')">' + (d.actif?'Actif':'Inactif') + '</span></td>'
+      + '<td class="actions"><button class="admin-btn admin-btn-gold" onclick="adminSaveDonjonPrix(' + d.id + ')">💾 Sauver</button></td>'
+      + '</tr>'
+    ).join('');
+    html += '<div style="margin-bottom:1.5rem;">'
+      + '<div class="admin-cat-label">' + esc(cat.emoji||'') + ' ' + esc(cat.nom) + ' <span style="color:var(--textm);font-size:0.75rem;font-weight:400;">(' + (cat.donjons||[]).length + ' donjons)</span></div>'
+      + '<table class="admin-table"><thead><tr><th>Nom</th><th>Prix (kamas)</th><th>Statut</th><th>Action</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--textd);">Aucun donjon.</td></tr>') + '</tbody></table>'
+      + '</div>';
+  }
+  document.getElementById('adminDonjonsContent').innerHTML = html || '<div class="empty-state">Aucun donjon.</div>';
+}
+
+async function adminSaveDonjonPrix(id) {
+  const input = document.getElementById('dprix_' + id);
+  const prix = parseInt(input.value) || 0;
+  try {
+    const r = await adminFetch('/api/admin/donjons/' + id + '/prix', { method: 'PUT', body: JSON.stringify({ prix }) });
+    showToast(r.ok ? '✅ Prix mis à jour' : '❌ Erreur');
+  } catch(e) { showToast('❌ Erreur réseau'); }
+}
+
+async function adminToggleDonjon(id) {
+  try {
+    const r = await adminFetch('/api/admin/donjons/' + id + '/toggle', { method: 'PUT', body: JSON.stringify({}) });
+    if (!r.ok) return;
+    const data = await r.json();
+    const badge = document.getElementById('dtoggle_' + id);
+    if (badge) { badge.className = 'toggle-badge ' + (data.donjon.actif?'on':'off'); badge.textContent = data.donjon.actif?'Actif':'Inactif'; }
+  } catch(e) {}
+}
+
+function adminShowAddDonjon() {
+  const catNames = adminDonjonsData.map(c => c.emoji + ' ' + c.nom).join(', ');
+  const catName = prompt('Catégorie (' + catNames + ') :');
+  if (!catName) return;
+  const cat = adminDonjonsData.find(c => c.nom.toLowerCase().includes(catName.toLowerCase().trim()));
+  if (!cat) { showToast('❌ Catégorie introuvable'); return; }
+  const nom = prompt('Nom du donjon :');
+  if (!nom) return;
+  const prix = parseInt(prompt('Prix en kamas (0 = à définir) :')) || 0;
+  adminFetch('/api/admin/donjons', { method:'POST', body: JSON.stringify({ categorie_id: cat.id, nom, prix }) })
+    .then(r => { if (r.ok) { showToast('✅ Donjon ajouté'); adminLoadDonjons(); } else showToast('❌ Ce donjon existe déjà'); });
+}
+
+// ── OPTIONS ───────────────────────────────────────────────────────────────────
+async function adminLoadOptionsSelectors() {
+  const sel = document.getElementById('adminOptionsDonjon');
+  try {
+    const r = await adminFetch('/api/admin/donjons');
+    const cats = await r.json();
+    sel.innerHTML = '<option value="">— Sélectionner un donjon —</option>';
+    for (const cat of cats) {
+      for (const d of (cat.donjons||[])) {
+        sel.innerHTML += '<option value="' + d.id + '">' + esc(cat.emoji||'') + ' ' + esc(d.nom) + '</option>';
+      }
+    }
+  } catch(e) {}
+  document.getElementById('adminOptionsContent').innerHTML = '';
+}
+
+async function adminLoadOptions() {
+  const donjonId = document.getElementById('adminOptionsDonjon').value;
+  if (!donjonId) { document.getElementById('adminOptionsContent').innerHTML = ''; return; }
+  try {
+    const r = await adminFetch('/api/admin/options');
+    const allOpts = await r.json();
+    const opts = allOpts.filter(o => String(o.donjon_id) === donjonId);
+    const rows = opts.map(o =>
+      '<tr>'
+      + '<td style="font-weight:600;">' + esc(o.nom) + '</td>'
+      + '<td><input class="admin-inline-input" type="number" value="' + o.prix + '" id="oprix_' + o.id + '" style="width:120px;"></td>'
+      + '<td><span class="toggle-badge ' + (o.actif?'on':'off') + '" id="otoggle_' + o.id + '" onclick="adminToggleOption(' + o.id + ')">' + (o.actif?'Actif':'Inactif') + '</span></td>'
+      + '<td class="actions"><button class="admin-btn admin-btn-gold" onclick="adminSaveOptionPrix(' + o.id + ')">💾 Sauver</button></td>'
+      + '</tr>'
+    ).join('');
+    document.getElementById('adminOptionsContent').innerHTML =
+      '<table class="admin-table"><thead><tr><th>Nom</th><th>Prix (kamas)</th><th>Statut</th><th>Action</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--textd);">Aucune option. Clique "+ Ajouter" pour commencer.</td></tr>') + '</tbody></table>';
+  } catch(e) { document.getElementById('adminOptionsContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
+
+async function adminSaveOptionPrix(id) {
+  const prix = parseInt(document.getElementById('oprix_' + id).value) || 0;
+  try {
+    const r = await adminFetch('/api/admin/options/' + id + '/prix', { method:'PUT', body: JSON.stringify({ prix }) });
+    showToast(r.ok ? '✅ Prix option mis à jour' : '❌ Erreur');
+  } catch(e) {}
+}
+
+async function adminToggleOption(id) {
+  try {
+    await adminFetch('/api/admin/options/' + id + '/actif', { method:'PUT', body: JSON.stringify({ actif: true }) });
+    adminLoadOptions(); // reload pour état correct
+  } catch(e) {}
+}
+
+function adminShowAddOption() {
+  const donjonId = document.getElementById('adminOptionsDonjon').value;
+  if (!donjonId) { showToast('⚠️ Sélectionne un donjon d\'abord'); return; }
+  const nom = prompt('Nom de l\'option / succès :');
+  if (!nom) return;
+  const prix = parseInt(prompt('Prix supplémentaire en kamas (0 = gratuit) :')) || 0;
+  adminFetch('/api/admin/options', { method:'POST', body: JSON.stringify({ donjon_id: parseInt(donjonId), nom, prix }) })
+    .then(async r => {
+      if (r.ok) { showToast('✅ Option ajoutée'); adminLoadOptions(); }
+      else { const d = await r.json(); showToast('❌ ' + (d.error||'Erreur')); }
+    });
+}
+
+// ── RANGS ─────────────────────────────────────────────────────────────────────
+async function adminLoadRangs() {
+  try {
+    const r = await fetch(API + '/api/ranks');
+    const ranks = await r.json();
+    const rows = ranks.map(rk => {
+      const hex = '#' + Number(rk.couleur).toString(16).padStart(6,'0');
+      return '<tr>'
+        + '<td><input class="admin-inline-input wide" type="text" value="' + esc(rk.nom) + '" id="rnom_' + rk.id + '"></td>'
+        + '<td><input class="admin-inline-input" type="number" value="' + rk.seuil + '" id="rseuil_' + rk.id + '" style="width:80px;"> <span style="color:var(--textm);font-size:0.75rem;">pass.</span></td>'
+        + '<td style="display:flex;align-items:center;gap:6px;">'
+        + '<span class="rank-color-dot" id="rdot_' + rk.id + '" style="background:' + hex + ';"></span>'
+        + '<input type="color" value="' + hex + '" id="rcouleur_' + rk.id + '" style="width:36px;height:22px;border:none;background:none;cursor:pointer;padding:0;" oninput="document.getElementById(\'rdot_' + rk.id + '\').style.background=this.value">'
+        + '</td>'
+        + '<td class="actions">'
+        + '<button class="admin-btn admin-btn-gold" onclick="adminSaveRang(' + rk.id + ')">💾 Sauver</button>'
+        + '<button class="admin-btn admin-btn-red" onclick="adminDeleteRang(' + rk.id + ')">🗑️</button>'
+        + '</td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('adminRangsContent').innerHTML =
+      '<table class="admin-table"><thead><tr><th>Nom</th><th>Seuil</th><th>Couleur</th><th>Actions</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--textd);">Aucun rang.</td></tr>') + '</tbody></table>';
+  } catch(e) { document.getElementById('adminRangsContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
+
+async function adminSaveRang(id) {
+  const nom    = document.getElementById('rnom_' + id).value;
+  const seuil  = parseInt(document.getElementById('rseuil_' + id).value) || 0;
+  const hexCol = document.getElementById('rcouleur_' + id).value;
+  const couleur = parseInt(hexCol.replace('#',''), 16);
+  try {
+    const r = await adminFetch('/api/admin/ranks/' + id, { method:'PUT', body: JSON.stringify({ nom, seuil, couleur }) });
+    showToast(r.ok ? '✅ Rang mis à jour' : '❌ Erreur');
+  } catch(e) {}
+}
+
+async function adminDeleteRang(id) {
+  if (!confirm('Supprimer ce rang définitivement ?')) return;
+  try {
+    const r = await adminFetch('/api/admin/ranks/' + id, { method:'DELETE' });
+    if (r.ok) { showToast('✅ Rang supprimé'); adminLoadRangs(); }
+  } catch(e) {}
+}
+
+function adminShowAddRang() {
+  const nom = prompt('Nom du rang :');
+  if (!nom) return;
+  const seuil = parseInt(prompt('Seuil (passages minimum pour ce rang) :')) || 0;
+  const hexColor = prompt('Couleur hexadécimale (ex: #e74c3c) :', '#95a5a6') || '#95a5a6';
+  const couleur = parseInt(hexColor.replace('#',''), 16);
+  adminFetch('/api/admin/ranks', { method:'POST', body: JSON.stringify({ nom, seuil, couleur }) })
+    .then(r => { if (r.ok) { showToast('✅ Rang ajouté'); adminLoadRangs(); } else showToast('❌ Erreur'); });
+}
+
+// ── JOUEURS ───────────────────────────────────────────────────────────────────
+async function adminLoadJoueurs() {
+  try {
+    const [usersR, ranksR] = await Promise.all([
+      adminFetch('/api/admin/users'),
+      fetch(API + '/api/ranks'),
+    ]);
+    const users = await usersR.json();
+    const ranks = await ranksR.json();
+    const getRankForUser = (passages) => {
+      let cur = ranks[0]; for (const rk of ranks) { if (passages >= rk.seuil) cur = rk; } return cur;
+    };
+    const rows = users.map((u, i) => {
+      const av = u.avatar
+        ? '<img src="https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:7px;object-fit:cover;" onerror="this.style.display=\'none\'">'
+        : '<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--card2);font-size:0.6rem;font-weight:700;color:var(--gold2);margin-right:7px;">' + esc(u.username.slice(0,2).toUpperCase()) + '</span>';
+      const rk = getRankForUser(u.total_passages);
+      const rkHex = rk ? ('#' + Number(rk.couleur).toString(16).padStart(6,'0')) : 'var(--gold)';
+      const pos = u.fidelite ? (PASSAGES_AVANT_REMISE - u.fidelite.passagesRestants) : 0;
+      const fidTxt = u.fidelite && u.fidelite.estRemise
+        ? '<span style="color:var(--gold);font-size:0.78rem;font-weight:700;">🎁 -50% dispo</span>'
+        : pos + '/' + PASSAGES_AVANT_REMISE;
+      return '<tr>'
+        + '<td style="color:var(--textm);font-family:\'Rajdhani\',sans-serif;font-weight:700;">#' + (i+1) + '</td>'
+        + '<td>' + av + '<span style="font-weight:600;">' + esc(u.username) + '</span></td>'
+        + '<td style="font-family:\'Rajdhani\',sans-serif;font-weight:700;color:var(--gold2);">' + u.total_passages + '</td>'
+        + '<td style="color:var(--textm);">' + u.remises_utilisees + '</td>'
+        + '<td><span style="font-size:0.72rem;font-weight:700;padding:2px 7px;border-radius:3px;color:' + rkHex + ';background:' + rkHex + '18;border:1px solid ' + rkHex + '40;">' + esc(rk?rk.nom:'—') + '</span></td>'
+        + '<td>' + fidTxt + '</td>'
+        + '<td class="actions">'
+        + '<button class="admin-btn admin-btn-green" onclick="adminAdjustJoueur(\'' + u.id + '\',1)">+1</button>'
+        + '<button class="admin-btn admin-btn-red" onclick="adminAdjustJoueur(\'' + u.id + '\',-1)">-1</button>'
+        + '<button class="admin-btn admin-btn-blue" onclick="adminResetJoueur(\'' + u.id + '\')">Reset</button>'
+        + '</td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('adminJoueursContent').innerHTML =
+      '<table class="admin-table"><thead><tr><th>#</th><th>Joueur</th><th>Passages</th><th>Remises</th><th>Rang</th><th>Fidélité</th><th>Actions</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--textd);">Aucun joueur.</td></tr>') + '</tbody></table>';
+  } catch(e) { document.getElementById('adminJoueursContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
+
+async function adminAdjustJoueur(id, delta) {
+  try {
+    const r = await adminFetch('/api/admin/users/' + id + '/adjust', { method:'POST', body: JSON.stringify({ delta }) });
+    if (r.ok) { showToast(delta > 0 ? '✅ +1 passage ajouté' : '✅ -1 passage retiré'); adminLoadJoueurs(); }
+  } catch(e) {}
+}
+
+async function adminResetJoueur(id) {
+  if (!confirm('Remettre ce joueur à 0 passage ?')) return;
+  try {
+    const r = await adminFetch('/api/admin/users/' + id + '/reset', { method:'POST', body: JSON.stringify({}) });
+    if (r.ok) { showToast('✅ Joueur remis à 0'); adminLoadJoueurs(); }
+  } catch(e) {}
+}
+
+// ── ÉQUIPE (public) ───────────────────────────────────────────────────────────
+let teamLoaded = false;
+async function loadTeam() {
+  if (teamLoaded) return;
+  teamLoaded = true;
+  try {
+    const [teamR, statsR] = await Promise.all([
+      fetch(API + '/api/team'),
+      fetch(API + '/api/stats'),
+    ]);
+    const members = await teamR.json();
+    const stats   = await statsR.json();
+    const grid = document.getElementById('teamGrid');
+    if (!grid) return;
+    if (!members.length) {
+      grid.innerHTML = '<div class="empty-state">Aucun passeur pour l\'instant.</div>';
+      return;
+    }
+    grid.innerHTML = members.map(m => {
+      const initials = m.nom.slice(0,2).toUpperCase();
+      // Priorité : avatar_url custom > hash Discord depuis DB > initiales
+      const resolvedAv = m.avatar_url
+        || (m.discord_id && m.discord_avatar ? 'https://cdn.discordapp.com/avatars/' + m.discord_id + '/' + m.discord_avatar + '.png' : null);
+      let avHtml;
+      if (resolvedAv) {
+        avHtml = '<img src="' + esc(resolvedAv) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML=\'<span>' + initials + '</span>\'">';
+      } else {
+        avHtml = '<span>' + initials + '</span>';
+      }
+      return '<div class="team-card">'
+        + '<div class="team-banner"></div>'
+        + '<div class="team-body">'
+        + '<div class="team-avatar" style="overflow:hidden;">' + avHtml + '</div>'
+        + '<div class="team-name">' + esc(m.nom) + '</div>'
+        + '<div class="team-role">' + esc(m.role) + ' — Serveur HELL MINA</div>'
+        + (m.bio ? '<p class="team-bio">' + esc(m.bio) + '</p>' : '')
+        + '<div class="team-stats">'
+        + '<div class="team-stat"><div class="team-stat-num">' + (m.passages || stats.totalPassages || '—') + '</div><div class="team-stat-label">Passages validés</div></div>'
+        + '<div class="team-stat"><div class="team-stat-num">' + (stats.totalJoueurs || '—') + '</div><div class="team-stat-label">Aventuriers</div></div>'
+        + '<div class="team-stat"><div class="team-stat-num" id="team-donjons">—</div><div class="team-stat-label">Donjons dispo.</div></div>'
+        + '</div>'
+        + '<ul class="team-features">'
+        + '<li>Prix fixes et transparents, annoncés avant chaque passage</li>'
+        + '<li>Remise de -50% tous les 3 passages cumulés</li>'
+        + '<li>Système de fidélité avec classement et rangs Discord</li>'
+        + '<li>Ticket Discord dédié pour chaque passage</li>'
+        + '<li>Disponible tous les jours, réponse rapide</li>'
+        + '</ul>'
+        + '<div style="margin-top:1.5rem;"><a class="btn-primary" href="' + DISCORD + '" target="_blank" rel="noopener">Contacter via Discord</a></div>'
+        + '</div></div>';
+    }).join('');
+    // Met à jour le nb de donjons dans chaque carte
+    const nb = allDonjons.length || '—';
+    document.querySelectorAll('#team-donjons').forEach(el => el.textContent = nb);
+  } catch(e) {
+    const grid = document.getElementById('teamGrid');
+    if (grid) grid.innerHTML = '<div class="empty-state">Impossible de charger l\'équipe.</div>';
+  }
+}
+
+// ── ÉQUIPE (admin) ────────────────────────────────────────────────────────────
+async function adminLoadEquipe() {
+  try {
+    const r = await adminFetch('/api/admin/team');
+    const members = await r.json();
+    const rows = members.map(m => {
+      const avSrc = m.avatar_url
+        || (m.discord_id && m.discord_avatar ? ('https://cdn.discordapp.com/avatars/' + m.discord_id + '/' + m.discord_avatar + '.png') : null);
+      const avImg = avSrc
+        ? '<img src="' + esc(avSrc) + '" style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;" onerror="this.style.display=\'none\'">'
+        : '<span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--card2);font-size:0.65rem;font-weight:700;color:var(--gold2);margin-right:8px;">' + esc(m.nom.slice(0,2).toUpperCase()) + '</span>';
+      return '<tr>'
+        + '<td>' + avImg + '<span style="font-weight:600;">' + esc(m.nom) + '</span></td>'
+        + '<td style="color:var(--textm);">' + esc(m.role) + '</td>'
+        + '<td style="color:var(--textm);font-size:0.78rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(m.bio||'') + '</td>'
+        + '<td><span class="toggle-badge ' + (m.actif?'on':'off') + '">' + (m.actif?'Actif':'Inactif') + '</span></td>'
+        + '<td class="actions">'
+        + '<button class="admin-btn admin-btn-blue" onclick="adminEditMembre(' + m.id + ')">✏️ Modifier</button>'
+        + '<button class="admin-btn admin-btn-red" onclick="adminDeleteMembre(' + m.id + ')">🗑️</button>'
+        + '</td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('adminEquipeContent').innerHTML =
+      '<table class="admin-table"><thead><tr><th>Nom</th><th>Rôle</th><th>Bio</th><th>Statut</th><th>Actions</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--textd);">Aucun membre.</td></tr>') + '</tbody></table>';
+  } catch(e) { document.getElementById('adminEquipeContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
+
+function adminShowAddMembre() {
+  const nom = prompt('Nom du passeur :');
+  if (!nom) return;
+  const role = prompt('Rôle (ex: Passeur Principal) :', 'Passeur') || 'Passeur';
+  const bio = prompt('Bio (description courte) :') || '';
+  const discord_id = prompt('Discord ID (pour l\'avatar, optionnel — laisse vide si inconnu) :') || null;
+  const avatar_url = prompt('URL d\'avatar custom (optionnel — laisse vide) :') || null;
+  adminFetch('/api/admin/team', {
+    method: 'POST',
+    body: JSON.stringify({ nom, role, bio, discord_id: discord_id||null, avatar_url: avatar_url||null, ordre: 99 })
+  }).then(async r => {
+    if (r.ok) { showToast('✅ Passeur ajouté'); teamLoaded = false; adminLoadEquipe(); }
+    else { const d = await r.json(); showToast('❌ ' + (d.error||'Erreur')); }
+  });
+}
+
+async function adminEditMembre(id) {
+  try {
+    const r = await adminFetch('/api/admin/team');
+    const members = await r.json();
+    const m = members.find(x => x.id === id);
+    if (!m) return;
+
+    const nom        = prompt('Nom :', m.nom);
+    if (nom === null) return;
+    const role       = prompt('Rôle :', m.role) || m.role;
+    const bio        = prompt('Bio :', m.bio) || '';
+    const discord_id = prompt('Discord ID (pour avatar auto) :', m.discord_id||'') || null;
+    const avatar_url = prompt('URL avatar custom :', m.avatar_url||'') || null;
+    const actifStr   = prompt('Actif ? (oui/non) :', m.actif ? 'oui' : 'non');
+    const actif      = actifStr !== null ? (actifStr.trim().toLowerCase() !== 'non') : m.actif;
+
+    const res = await adminFetch('/api/admin/team/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({ nom, role, bio, discord_id: discord_id||null, avatar_url: avatar_url||null, actif })
+    });
+    if (res.ok) { showToast('✅ Membre mis à jour'); teamLoaded = false; adminLoadEquipe(); }
+    else showToast('❌ Erreur lors de la mise à jour');
+  } catch(e) { showToast('❌ Erreur réseau'); }
+}
+
+async function adminDeleteMembre(id) {
+  if (!confirm('Supprimer ce passeur de l\'équipe ?')) return;
+  try {
+    const r = await adminFetch('/api/admin/team/' + id, { method: 'DELETE' });
+    if (r.ok) { showToast('✅ Membre supprimé'); teamLoaded = false; adminLoadEquipe(); }
+  } catch(e) {}
+}
+
+// ── PASSAGES ──────────────────────────────────────────────────────────────────
+async function adminLoadPassages() {
+  try {
+    const r = await adminFetch('/api/admin/passages');
+    const passages = await r.json();
+    const rows = passages.map(p => {
+      const d = new Date(p.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return '<tr>'
+        + '<td style="font-weight:600;">' + esc(p.username) + '</td>'
+        + '<td>' + esc(p.donjon_nom||'?') + '</td>'
+        + '<td style="color:var(--textm);font-size:0.78rem;">' + esc(p.cat_nom||'?') + '</td>'
+        + '<td style="color:var(--gold2);font-weight:700;">' + (p.prix_paye>0?fmtK(p.prix_paye):'—') + '</td>'
+        + '<td>' + (p.est_remise?'<span style="color:var(--gold);font-weight:700;font-size:0.78rem;">-50%</span>':'—') + '</td>'
+        + '<td style="color:var(--textm);font-size:0.78rem;">' + d + '</td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('adminPassagesContent').innerHTML =
+      '<table class="admin-table"><thead><tr><th>Joueur</th><th>Donjon</th><th>Catégorie</th><th>Prix payé</th><th>Remise</th><th>Date</th></tr></thead>'
+      + '<tbody>' + (rows||'<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--textd);">Aucun passage.</td></tr>') + '</tbody></table>';
+  } catch(e) { document.getElementById('adminPassagesContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
+}
 </script>
+
+<!-- MODAL SUCCÈS DONJON -->
+<div id="optionsModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)closeOptionsModal()">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1;">
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:1.05rem;color:var(--gold2)" id="optionsModalNom">—</div>
+        <div style="font-size:0.8rem;color:var(--textm);margin-top:3px;">Prix de base : <span id="optionsModalPrix" style="color:var(--gold);font-weight:700;">—</span></div>
+      </div>
+      <button onclick="closeOptionsModal()" style="background:none;border:none;color:var(--textm);font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div style="padding:1.2rem;">
+      <div style="font-size:0.78rem;color:var(--textm);margin-bottom:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Options / Succès <span style="font-weight:400;">(en supplément du prix de base)</span></div>
+      <div id="optionsModalBody" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+    </div>
+    <div style="padding:1rem 1.4rem;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--bg2);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;">
+        <span style="font-size:0.85rem;color:var(--textm);">Total estimé</span>
+        <span style="font-size:1.15rem;color:var(--gold);font-weight:700;" id="optionsTotalPrix">—</span>
+      </div>
+      <button id="creerTicketBtn" onclick="creerTicketDepuisSite()" style="width:100%;background:var(--gold);color:#1a0a00;border:none;border-radius:8px;padding:0.75rem;font-weight:700;font-size:0.95rem;cursor:pointer;font-family:'Cinzel',serif;transition:opacity .2s;">🎫 Créer le ticket Discord</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentDonjon = null;
+
+async function openOptionsModal(donjon) {
+  currentDonjon = donjon;
+  const modal = document.getElementById('optionsModal');
+  document.getElementById('optionsModalNom').textContent = donjon.nom;
+  document.getElementById('optionsModalPrix').textContent = donjon.prix > 0 ? fmtK(donjon.prix) : 'À définir';
+  document.getElementById('optionsModalBody').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--textm);">Chargement...</div>';
+  document.getElementById('optionsTotalPrix').textContent = donjon.prix > 0 ? fmtK(donjon.prix) : 'À définir';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  try {
+    const r = await fetch(API + '/api/donjons/' + donjon.id + '/options');
+    const opts = await r.json();
+    renderOptionsModal(donjon, opts);
+  } catch(e) {
+    document.getElementById('optionsModalBody').innerHTML = '<p style="color:var(--textd);padding:1rem;">Impossible de charger les options.</p>';
+  }
+}
+
+function renderOptionsModal(donjon, opts) {
+  const body = document.getElementById('optionsModalBody');
+  if (!opts || !opts.length) {
+    body.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--textm);font-size:0.85rem;">Aucune option disponible pour ce donjon.</div>';
+    calcOptionsTotal(donjon);
+    return;
+  }
+  body.innerHTML = opts.map(o => {
+    const prixFmt = o.prix > 0 ? '+' + fmtK(o.prix) : 'Gratuit';
+    return '<label style="display:flex;gap:0.8rem;align-items:center;padding:0.8rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .2s;" onmouseover="this.style.borderColor=&quot;var(--gold)&quot;" onmouseout="this.style.borderColor=&quot;var(--border)&quot;">'
+      + '<input type="checkbox" value="' + o.id + '" data-prix="' + (o.prix||0) + '" onchange="calcOptionsTotal(currentDonjon)" style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;">'
+      + '<span style="flex:1;font-weight:600;font-size:0.9rem;">' + esc(o.nom) + '</span>'
+      + '<span style="color:var(--gold2);font-weight:700;font-size:0.88rem;white-space:nowrap;">' + prixFmt + '</span>'
+      + '</label>';
+  }).join('');
+  calcOptionsTotal(donjon);
+}
+
+function calcOptionsTotal(donjon) {
+  if (!donjon) return;
+  const prixBase = donjon.prix || 0;
+  let prixOpts = 0;
+  document.querySelectorAll('#optionsModalBody input[type=checkbox]:checked').forEach(cb => {
+    prixOpts += parseInt(cb.dataset.prix) || 0;
+  });
+  const total = prixBase + prixOpts;
+  document.getElementById('optionsTotalPrix').textContent = total > 0 ? fmtK(total) : 'À définir';
+}
+
+function closeOptionsModal() {
+  document.getElementById('optionsModal').style.display = 'none';
+  document.body.style.overflow = '';
+  currentDonjon = null;
+}
+
+async function creerTicketDepuisSite() {
+  if (!authToken) {
+    window.location.href = API + '/api/auth/discord';
+    return;
+  }
+  if (!currentDonjon) return;
+  const optionIds = Array.from(document.querySelectorAll('#optionsModalBody input[type=checkbox]:checked')).map(cb => parseInt(cb.value));
+  const btn = document.getElementById('creerTicketBtn');
+  btn.disabled = true; btn.style.opacity = '0.6'; btn.textContent = 'Création en cours...';
+  try {
+    const r = await fetch(API + '/api/ticket/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+      body: JSON.stringify({ donjon_id: currentDonjon.id, option_ids: optionIds }),
+    });
+    const data = await r.json();
+    if (r.ok) {
+      closeOptionsModal();
+      showToast('✅ Ticket créé : #' + data.channel);
+    } else {
+      showToast('❌ ' + (data.error || 'Erreur inconnue'));
+    }
+  } catch(e) {
+    showToast('❌ Erreur réseau');
+  } finally {
+    btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '🎫 Créer le ticket Discord';
+  }
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeOptionsModal(); });
+</script>
+
+<div id="toast-notif"></div>
 </body>
 </html>
