@@ -2196,10 +2196,13 @@ function adminRenderDonjons() {
   for (const cat of cats) {
     const rows = (cat.donjons||[]).map(d =>
       '<tr>'
-      + '<td style="font-weight:600;">' + esc(d.nom) + '</td>'
+      + '<td style="font-weight:600;" id="dnom_label_' + d.id + '">' + esc(d.nom) + '</td>'
       + '<td><input class="admin-inline-input" type="number" value="' + d.prix + '" id="dprix_' + d.id + '" style="width:120px;"></td>'
       + '<td><span class="toggle-badge ' + (d.actif?'on':'off') + '" id="dtoggle_' + d.id + '" onclick="adminToggleDonjon(' + d.id + ')">' + (d.actif?'Actif':'Inactif') + '</span></td>'
-      + '<td class="actions"><button class="admin-btn admin-btn-gold" onclick="adminSaveDonjonPrix(' + d.id + ')">💾 Sauver</button></td>'
+      + '<td class="actions">'
+      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveDonjonPrix(' + d.id + ')">💾 Prix</button>'
+      + '<button class="admin-btn admin-btn-blue" onclick="adminEditDonjonNom(' + d.id + ',\'' + esc(d.nom).replace(/'/g,"\\'") + '\')">✏️ Nom</button>'
+      + '</td>'
       + '</tr>'
     ).join('');
     html += '<div style="margin-bottom:1.5rem;">'
@@ -2224,6 +2227,19 @@ async function adminSaveDonjonPrix(id) {
       showToast('❌ ' + (err.error || 'Erreur serveur'));
     }
   } catch(e) { showToast('❌ Erreur réseau : ' + e.message); }
+}
+
+async function adminEditDonjonNom(id, currentNom) {
+  const nom = prompt('Nouveau nom du donjon :', currentNom);
+  if (!nom || nom === currentNom) return;
+  try {
+    const r = await adminFetch('/api/admin/donjons/' + id + '/nom', { method: 'PUT', body: JSON.stringify({ nom }) });
+    if (r.ok) {
+      const label = document.getElementById('dnom_label_' + id);
+      if (label) label.textContent = nom;
+      showToast('✅ Nom mis à jour');
+    } else { showToast('❌ Erreur'); }
+  } catch(e) { showToast('❌ Erreur réseau'); }
 }
 
 async function adminToggleDonjon(id) {
