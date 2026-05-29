@@ -1686,8 +1686,8 @@ function showPage(page) {
   const ml = document.querySelector('.main-layout');
   if (ml) ml.style.display = FULLWIDTH_PAGES.includes(page) ? 'none' : 'flex';
   currentPage = page;
-  // Mémoriser la page dans le hash pour que l'actualisation garde la bonne page
-  if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
+  // Mémoriser la page pour restauration après actualisation
+  try { localStorage.setItem('dp_page', page); } catch(_) {}
   if (page === 'home') loadHome();
   if (page === 'classement' && !lbLoaded) loadLeaderboard();
   if (page === 'equipe') loadTeam();
@@ -1696,8 +1696,9 @@ function showPage(page) {
   return false;
 }
 
-// Au chargement, lire le hash pour restaurer la bonne page
-const _initialPage = VALID_PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+// Restaurer la dernière page visitée au chargement
+const _savedPage = localStorage.getItem('dp_page');
+const _initialPage = VALID_PAGES.includes(_savedPage) ? _savedPage : 'home';
 showPage(_initialPage);
 
 /* ═════════════════════════════════
