@@ -1672,8 +1672,11 @@ function esc(s) {
 ═════════════════════════════════ */
 let currentPage = 'donjons';
 const FULLWIDTH_PAGES = ['home','profil','admin'];
+const VALID_PAGES = ['home','donjons','classement','equipe','profil','admin'];
+
 function showPage(page) {
-  ['home','donjons','classement','equipe','profil','admin'].forEach(p => {
+  if (!VALID_PAGES.includes(page)) page = 'home';
+  VALID_PAGES.forEach(p => {
     const el = document.getElementById('page-' + p);
     if (el) el.style.display = p === page ? 'block' : 'none';
     const navEl = document.getElementById('nav-' + p);
@@ -1683,6 +1686,8 @@ function showPage(page) {
   const ml = document.querySelector('.main-layout');
   if (ml) ml.style.display = FULLWIDTH_PAGES.includes(page) ? 'none' : 'flex';
   currentPage = page;
+  // Mémoriser la page dans le hash pour que l'actualisation garde la bonne page
+  if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
   if (page === 'home') loadHome();
   if (page === 'classement' && !lbLoaded) loadLeaderboard();
   if (page === 'equipe') loadTeam();
@@ -1690,7 +1695,10 @@ function showPage(page) {
   if (page === 'admin') adminTab('dashboard');
   return false;
 }
-showPage('home');
+
+// Au chargement, lire le hash pour restaurer la bonne page
+const _initialPage = VALID_PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+showPage(_initialPage);
 
 /* ═════════════════════════════════
    DATA
