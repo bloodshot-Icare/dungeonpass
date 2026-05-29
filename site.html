@@ -1942,8 +1942,14 @@ async function adminSaveDonjonPrix(id) {
   const prix = parseInt(input.value) || 0;
   try {
     const r = await adminFetch('/api/admin/donjons/' + id + '/prix', { method: 'PUT', body: JSON.stringify({ prix }) });
-    showToast(r.ok ? '✅ Prix mis à jour' : '❌ Erreur');
-  } catch(e) { showToast('❌ Erreur réseau'); }
+    if (r.ok) {
+      const data = await r.json();
+      showToast('✅ Prix mis à jour → ' + (data.donjon?.prix ?? prix).toLocaleString('fr-FR') + ' ₭');
+    } else {
+      const err = await r.json().catch(() => ({}));
+      showToast('❌ ' + (err.error || 'Erreur serveur'));
+    }
+  } catch(e) { showToast('❌ Erreur réseau : ' + e.message); }
 }
 
 async function adminToggleDonjon(id) {
@@ -1994,14 +2000,18 @@ async function adminLoadOptions() {
     const opts = allOpts.filter(o => String(o.donjon_id) === donjonId);
     const rows = opts.map(o =>
       '<tr>'
-      + '<td style="font-weight:600;">' + esc(o.nom) + '</td>'
+      + '<td style="font-weight:600;" id="onom_label_' + o.id + '">' + esc(o.nom) + '</td>'
       + '<td><input class="admin-inline-input" type="number" value="' + o.prix + '" id="oprix_' + o.id + '" style="width:120px;"></td>'
-      + '<td><span class="toggle-badge ' + (o.actif?'on':'off') + '" id="otoggle_' + o.id + '" onclick="adminToggleOption(' + o.id + ')">' + (o.actif?'Actif':'Inactif') + '</span></td>'
-      + '<td class="actions"><button class="admin-btn admin-btn-gold" onclick="adminSaveOptionPrix(' + o.id + ')">💾 Sauver</button></td>'
+      + '<td><span class="toggle-badge ' + (o.actif?'on':'off') + '" id="otoggle_' + o.id + '" onclick="adminToggleOption(' + o.id + ')">' + (o.actif?'✅ Actif':'⛔ Inactif') + '</span></td>'
+      + '<td class="actions">'
+      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveOptionPrix(' + o.id + ')">💾 Prix</button>'
+      + '<button class="admin-btn admin-btn-blue" onclick="adminEditOptionNom(' + o.id + ',\'' + esc(o.nom).replace(/'/g,"\\'") + '\')">✏️ Nom</button>'
+      + '<button class="admin-btn admin-btn-red" onclick="adminDeleteOption(' + o.id + ',\'' + esc(o.nom).replace(/'/g,"\\'") + '\')">🗑️</button>'
+      + '</td>'
       + '</tr>'
     ).join('');
     document.getElementById('adminOptionsContent').innerHTML =
-      '<table class="admin-table"><thead><tr><th>Nom</th><th>Prix (kamas)</th><th>Statut</th><th>Action</th></tr></thead>'
+      '<table class="admin-table"><thead><tr><th>Nom</th><th>Prix (kamas)</th><th>Statut</th><th>Actions</th></tr></thead>'
       + '<tbody>' + (rows||'<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--textd);">Aucune option. Clique "+ Ajouter" pour commencer.</td></tr>') + '</tbody></table>';
   } catch(e) { document.getElementById('adminOptionsContent').innerHTML = '<div class="empty-state">Erreur.</div>'; }
 }
@@ -2016,9 +2026,38 @@ async function adminSaveOptionPrix(id) {
 
 async function adminToggleOption(id) {
   try {
-    await adminFetch('/api/admin/options/' + id + '/actif', { method:'PUT', body: JSON.stringify({ actif: true }) });
-    adminLoadOptions(); // reload pour état correct
+    const r = await adminFetch('/api/admin/options/' + id + '/actif', { method: 'PUT', body: JSON.stringify({}) });
+    if (r.ok) {
+      const data = await r.json();
+      const badge = document.getElementById('otoggle_' + id);
+      if (badge) {
+        badge.className = 'toggle-badge ' + (data.actif ? 'on' : 'off');
+        badge.textContent = data.actif ? '✅ Actif' : '⛔ Inactif';
+      }
+    }
   } catch(e) {}
+}
+
+async function adminEditOptionNom(id, currentNom) {
+  const nom = prompt('Nouveau nom de l\'option :', currentNom);
+  if (!nom || nom === currentNom) return;
+  try {
+    const r = await adminFetch('/api/admin/options/' + id + '/nom', { method: 'PUT', body: JSON.stringify({ nom }) });
+    if (r.ok) {
+      const label = document.getElementById('onom_label_' + id);
+      if (label) label.textContent = nom;
+      showToast('✅ Nom mis à jour');
+    } else { showToast('❌ Erreur'); }
+  } catch(e) { showToast('❌ Erreur réseau'); }
+}
+
+async function adminDeleteOption(id, nom) {
+  if (!confirm('Supprimer l\'option "' + nom + '" ?')) return;
+  try {
+    const r = await adminFetch('/api/admin/options/' + id, { method: 'DELETE' });
+    if (r.ok) { showToast('✅ Option supprimée'); adminLoadOptions(); }
+    else { showToast('❌ Erreur'); }
+  } catch(e) { showToast('❌ Erreur réseau'); }
 }
 
 function adminShowAddOption() {
