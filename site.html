@@ -1696,9 +1696,10 @@ function showPage(page) {
   return false;
 }
 
-// Restaurer la dernière page visitée au chargement
+// Restaurer la dernière page visitée (sauf admin/profil qui nécessitent une auth)
 const _savedPage = localStorage.getItem('dp_page');
-const _initialPage = VALID_PAGES.includes(_savedPage) ? _savedPage : 'home';
+const _RESTORABLE = ['home','donjons','classement','equipe'];
+const _initialPage = _RESTORABLE.includes(_savedPage) ? _savedPage : 'home';
 showPage(_initialPage);
 
 /* ═════════════════════════════════
