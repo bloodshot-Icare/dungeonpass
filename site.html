@@ -2200,7 +2200,7 @@ function adminRenderDonjons() {
       + '<td><input class="admin-inline-input" type="number" value="' + d.prix + '" id="dprix_' + d.id + '" style="width:120px;"></td>'
       + '<td><span class="toggle-badge ' + (d.actif?'on':'off') + '" id="dtoggle_' + d.id + '" onclick="adminToggleDonjon(' + d.id + ')">' + (d.actif?'Actif':'Inactif') + '</span></td>'
       + '<td class="actions">'
-      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveDonjonPrix(' + d.id + ')">💾 Prix</button>'
+      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveDonjonPrix(' + d.id + ')">💾 Save</button>'
       + '<button class="admin-btn admin-btn-blue" onclick="adminEditDonjonNom(' + d.id + ',\'' + esc(d.nom).replace(/'/g,"\\'") + '\')">✏️ Nom</button>'
       + '</td>'
       + '</tr>'
