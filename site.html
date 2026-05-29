@@ -687,6 +687,7 @@ nav {
 /* ═══════════════════════════════════
    CLASSEMENT PAGE
 ═══════════════════════════════════ */
+#page-home { display: none; }
 #page-classement { display: none; }
 .podium-wrap {
   display: flex;
@@ -1075,6 +1076,133 @@ footer a { color: var(--gold); text-decoration: none; }
   display: flex; align-items: center; gap: 8px;
 }
 .podium-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* ── HOME PAGE ─────────────────────────────────────────────────────────────── */
+#page-home { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+.home-hero {
+  text-align: center;
+  padding: 4rem 1rem 3rem;
+  position: relative;
+}
+.home-hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.25);
+  border-radius: 50px; padding: 5px 16px; font-size: 0.75rem; color: var(--gold2);
+  margin-bottom: 1.5rem; letter-spacing: 0.05em;
+}
+.home-hero-title {
+  font-family: 'Rajdhani', sans-serif; font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 700; color: var(--text); line-height: 1.1; margin-bottom: 1rem;
+}
+.home-hero-title span { color: var(--gold2); }
+.home-hero-sub {
+  font-size: 1.05rem; color: var(--textm); max-width: 560px; margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+.home-hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.home-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--gold); color: #1a0a00; font-weight: 700; font-size: 0.95rem;
+  padding: 0.75rem 1.8rem; border-radius: var(--r); border: none; cursor: pointer;
+  text-decoration: none; transition: filter 0.2s;
+}
+.home-btn-primary:hover { filter: brightness(1.12); }
+.home-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--textm); font-size: 0.95rem;
+  padding: 0.75rem 1.8rem; border-radius: var(--r); border: 1px solid var(--border);
+  cursor: pointer; text-decoration: none; transition: border-color 0.2s, color 0.2s;
+}
+.home-btn-secondary:hover { border-color: rgba(212,160,23,0.4); color: var(--text); }
+
+.home-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin: 2.5rem 0;
+}
+.home-stat {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 1.4rem; text-align: center;
+}
+.home-stat-num {
+  font-family: 'Rajdhani', sans-serif; font-size: 2.2rem; font-weight: 700;
+  color: var(--gold2); line-height: 1;
+}
+.home-stat-lbl { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--textd); margin-top: 4px; }
+
+.home-section-title {
+  font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700;
+  color: var(--text); margin-bottom: 1.5rem;
+}
+.home-section-title span { color: var(--gold2); }
+
+.home-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3.5rem;
+}
+@media(max-width:600px){ .home-steps { grid-template-columns: 1fr; } .home-stats { grid-template-columns: repeat(3,1fr); } }
+.home-step {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 1.5rem; position: relative; overflow: hidden;
+}
+.home-step::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+.home-step-num {
+  width: 32px; height: 32px; border-radius: 50%; background: rgba(212,160,23,0.12);
+  border: 1px solid rgba(212,160,23,0.3); color: var(--gold2); font-size: 0.9rem;
+  font-weight: 700; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.9rem;
+}
+.home-step-title { font-weight: 700; color: var(--text); font-size: 0.95rem; margin-bottom: 0.4rem; }
+.home-step-desc { font-size: 0.82rem; color: var(--textm); line-height: 1.6; }
+
+.home-dj-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem; margin-bottom: 3.5rem;
+}
+.home-dj-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--r2);
+  overflow: hidden; cursor: pointer; transition: border-color 0.2s, transform 0.2s;
+}
+.home-dj-card:hover { border-color: rgba(212,160,23,0.35); transform: translateY(-2px); }
+.home-dj-img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+  background: var(--bg2);
+}
+.home-dj-img-placeholder {
+  width: 100%; aspect-ratio: 16/9; background: var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.home-dj-info { padding: 0.75rem 1rem; }
+.home-dj-name { font-weight: 700; color: var(--text); font-size: 0.85rem; margin-bottom: 2px; }
+.home-dj-prix { font-size: 0.78rem; color: var(--gold2); }
+
+.home-fidelite {
+  background: var(--card); border: 1px solid rgba(212,160,23,0.2);
+  border-radius: var(--r2); padding: 2rem; text-align: center; margin-bottom: 3.5rem;
+  position: relative; overflow: hidden;
+}
+.home-fidelite::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,160,23,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.home-fidelite-badge {
+  display: inline-block; background: rgba(212,160,23,0.1); border: 1px solid rgba(212,160,23,0.25);
+  border-radius: 50px; padding: 4px 14px; font-size: 0.72rem; color: var(--gold2);
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.home-fidelite-title { font-family: 'Rajdhani', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
+.home-fidelite-title span { color: var(--gold2); }
+.home-fidelite-desc { font-size: 0.88rem; color: var(--textm); max-width: 480px; margin: 0 auto; line-height: 1.7; }
+.home-fidelite-pills { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.2rem; }
+.home-fidelite-pill {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 0.4rem 0.9rem; font-size: 0.78rem; color: var(--textm);
+}
+.home-fidelite-pill strong { color: var(--gold2); }
 </style>
 </head>
 <body>
@@ -1092,12 +1220,13 @@ footer a { color: var(--gold); text-decoration: none; }
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#" onclick="showPage('donjons')">
+  <a class="nav-logo" href="#" onclick="showPage('home')">
     <img src="favicon.png" alt="Logo">
     <span class="nav-logo-text">Passages Donjons</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#" onclick="showPage('donjons')" id="nav-donjons" class="active"><span class="nav-icon">⚔</span> Voir les Donjons</a></li>
+    <li><a href="#" onclick="showPage('home')" id="nav-home" class="active"><span class="nav-icon">🏠</span> Accueil</a></li>
+    <li><a href="#" onclick="showPage('donjons')" id="nav-donjons"><span class="nav-icon">⚔</span> Donjons</a></li>
     <li><a href="#" onclick="showPage('classement')" id="nav-classement"><span class="nav-icon">🏆</span> Classement</a></li>
     <li id="nav-li-profil" style="display:none;"><a href="#" onclick="showPage('profil')" id="nav-profil"><span class="nav-icon">👤</span> Mon Profil</a></li>
     <li id="nav-li-admin" style="display:none;"><a href="#" onclick="showPage('admin')" id="nav-admin"><span class="nav-icon">🛡️</span> Admin</a></li>
@@ -1117,12 +1246,73 @@ footer a { color: var(--gold); text-decoration: none; }
 
 <!-- MENU MOBILE -->
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="showPage('home');toggleMenu()">🏠 Accueil</a>
   <a href="#" onclick="showPage('donjons');toggleMenu()">⚔ Donjons</a>
   <a href="#" onclick="showPage('classement');toggleMenu()">🏆 Classement</a>
   <a href="#" id="mob-profil" style="display:none;" onclick="showPage('profil');toggleMenu()">👤 Mon Profil</a>
   <a href="#" id="mob-admin" style="display:none;" onclick="showPage('admin');toggleMenu()">🛡️ Admin</a>
   <a href="#" onclick="showPage('equipe');toggleMenu()">⚜ L'Équipe</a>
   <a class="btn-discord" href="https://discord.gg/votre-lien" target="_blank">Discord</a>
+</div>
+
+<!-- PAGE HOME -->
+<div id="page-home">
+  <div class="home-hero">
+    <div class="home-hero-badge"><span class="hero-badge-dot"></span> Service actif — Serveur Hell Mina</div>
+    <h1 class="home-hero-title">Passages <span>Donjons</span> Dofus</h1>
+    <p class="home-hero-sub">Tous tes donjons clés en main. Prix fixes, passeurs expérimentés, fidélité récompensée automatiquement.</p>
+    <div class="home-hero-ctas">
+      <a class="home-btn-primary" href="https://discord.gg/votre-lien" target="_blank" rel="noopener">⚔ Réserver un passage</a>
+      <a class="home-btn-secondary" href="#" onclick="showPage('donjons')">Voir les donjons →</a>
+    </div>
+  </div>
+
+  <div class="home-stats">
+    <div class="home-stat"><div class="home-stat-num" id="home-stat-passages">—</div><div class="home-stat-lbl">Passages réalisés</div></div>
+    <div class="home-stat"><div class="home-stat-num" id="home-stat-joueurs">—</div><div class="home-stat-lbl">Aventuriers</div></div>
+    <div class="home-stat"><div class="home-stat-num" id="home-stat-donjons">—</div><div class="home-stat-lbl">Donjons disponibles</div></div>
+  </div>
+
+  <div class="home-section-title">Comment ça <span>fonctionne</span> ?</div>
+  <div class="home-steps">
+    <div class="home-step">
+      <div class="home-step-num">1</div>
+      <div class="home-step-title">Choisis ton donjon</div>
+      <div class="home-step-desc">Parcours notre catalogue, sélectionne ton donjon et tes succès optionnels. Le prix s'affiche instantanément.</div>
+    </div>
+    <div class="home-step">
+      <div class="home-step-num">2</div>
+      <div class="home-step-title">Ouvre un ticket</div>
+      <div class="home-step-desc">Connecte-toi avec Discord et confirme ta commande. Un passeur expérimenté prend en charge sous peu.</div>
+    </div>
+    <div class="home-step">
+      <div class="home-step-num">3</div>
+      <div class="home-step-title">Profite !</div>
+      <div class="home-step-desc">Le passage est effectué, tu paies le prix fixe. Après 3 passages, le suivant est automatiquement à -50%.</div>
+    </div>
+  </div>
+
+  <div class="home-section-title">Donjons <span>vedettes</span></div>
+  <div class="home-dj-grid" id="homeFeaturedGrid">
+    <div style="text-align:center;padding:2rem;color:var(--textd);grid-column:1/-1;"><span class="spinner"></span></div>
+  </div>
+
+  <div class="home-fidelite">
+    <div class="home-fidelite-badge">🎁 Programme de fidélité</div>
+    <div class="home-fidelite-title">Tous les 3 passages, le 4ème est à <span>-50%</span></div>
+    <div class="home-fidelite-desc">La remise est appliquée automatiquement, sans code promo ni démarche. Ta progression est sauvegardée et visible dans ton profil.</div>
+    <div class="home-fidelite-pills">
+      <span class="home-fidelite-pill">✅ <strong>Automatique</strong></span>
+      <span class="home-fidelite-pill">🎯 <strong>-50%</strong> sur le prix de base</span>
+      <span class="home-fidelite-pill">📊 Suivi dans ton profil</span>
+      <span class="home-fidelite-pill">♾️ Sans limite</span>
+    </div>
+  </div>
+
+  <div class="home-section-title">Notre <span>équipe</span></div>
+  <div id="homeTeamGrid" style="margin-bottom:3rem;">
+    <div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div>
+  </div>
 </div>
 
 <!-- HERO BANNER -->
@@ -1481,26 +1671,26 @@ function esc(s) {
    NAVIGATION PAGES
 ═════════════════════════════════ */
 let currentPage = 'donjons';
-const FULLWIDTH_PAGES = ['profil','admin'];
+const FULLWIDTH_PAGES = ['home','profil','admin'];
 function showPage(page) {
-  ['donjons','classement','equipe','profil','admin'].forEach(p => {
+  ['home','donjons','classement','equipe','profil','admin'].forEach(p => {
     const el = document.getElementById('page-' + p);
     if (el) el.style.display = p === page ? 'block' : 'none';
     const navEl = document.getElementById('nav-' + p);
     if (navEl) navEl.classList.toggle('active', p === page);
   });
   document.getElementById('heroBanner').style.display = page === 'donjons' ? '' : 'none';
-  // Masquer le main-layout (sidebar) pour les pages pleine largeur
   const ml = document.querySelector('.main-layout');
   if (ml) ml.style.display = FULLWIDTH_PAGES.includes(page) ? 'none' : 'flex';
   currentPage = page;
+  if (page === 'home') loadHome();
   if (page === 'classement' && !lbLoaded) loadLeaderboard();
   if (page === 'equipe') loadTeam();
   if (page === 'profil') loadProfile();
   if (page === 'admin') adminTab('dashboard');
   return false;
 }
-showPage('donjons');
+showPage('home');
 
 /* ═════════════════════════════════
    DATA
@@ -1511,6 +1701,78 @@ let currentCat = 'all';
 let currentSort = 'default';
 let currentSearch = '';
 let lbLoaded = false;
+
+/* ═════════════════════════════════
+   HOME
+═════════════════════════════════ */
+let homeLoaded = false;
+async function loadHome() {
+  // Stats
+  try {
+    const r = await fetch(API + '/api/stats');
+    const d = await r.json();
+    const s = id => document.getElementById(id);
+    if (s('home-stat-passages')) s('home-stat-passages').textContent = d.totalPassages ?? '—';
+    if (s('home-stat-joueurs'))  s('home-stat-joueurs').textContent  = d.totalJoueurs  ?? '—';
+  } catch(e) {}
+
+  if (homeLoaded) return;
+  homeLoaded = true;
+
+  // Donjons vedettes (les plus chers = les plus épiques)
+  try {
+    const r = await fetch(API + '/api/categories');
+    const cats = await r.json();
+    const featured = ['DÉCHIREUSE','DANTINÉA','OMBRE','ETERNEL CONFLIT','VENERABLE ENDORMI','KRALAMOURE','TAL KASHA','ANERICE'];
+    let donjons = cats.flatMap(c => (c.donjons||[]).map(d => ({...d, cat_nom:c.nom, cat_emoji:c.emoji})));
+    // Nombre de donjons total
+    const s = id => document.getElementById(id);
+    if (s('home-stat-donjons')) s('home-stat-donjons').textContent = donjons.length;
+    // Trier par ordre featured puis prix décroissant
+    const order = d => { const i = featured.indexOf(d.nom); return i >= 0 ? i : 99; };
+    donjons = donjons.slice().sort((a,b) => order(a) - order(b) || b.prix - a.prix).slice(0, 8);
+    const grid = document.getElementById('homeFeaturedGrid');
+    if (!grid) return;
+    grid.innerHTML = donjons.map(d => {
+      const img = getDjImg(d.nom);
+      const prix = d.prix > 0 ? fmtK(d.prix) : 'À définir';
+      const imgHtml = img
+        ? '<img class="home-dj-img" src="' + img + '" alt="' + esc(d.nom) + '" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=home-dj-img-placeholder>' + esc(d.cat_emoji) + '</div>\'">'
+        : '<div class="home-dj-img-placeholder">' + esc(d.cat_emoji) + '</div>';
+      return '<div class="home-dj-card" onclick="showPage(\'donjons\')">'
+        + imgHtml
+        + '<div class="home-dj-info">'
+        + '<div class="home-dj-name">' + esc(d.nom) + '</div>'
+        + '<div class="home-dj-prix">' + prix + '</div>'
+        + '</div></div>';
+    }).join('');
+  } catch(e) { const g = document.getElementById('homeFeaturedGrid'); if(g) g.innerHTML=''; }
+
+  // Équipe
+  try {
+    const r = await fetch(API + '/api/team');
+    const team = await r.json();
+    const tg = document.getElementById('homeTeamGrid');
+    if (!tg || !team.length) { if(tg) tg.innerHTML = ''; return; }
+    tg.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:3rem;';
+    tg.innerHTML = team.map(m => {
+      const avUrl = m.discord_id && m.discord_avatar
+        ? 'https://cdn.discordapp.com/avatars/' + m.discord_id + '/' + m.discord_avatar + '.png'
+        : null;
+      const initials = (m.nom||'?').slice(0,2).toUpperCase();
+      const avHtml = avUrl
+        ? '<img src="' + esc(avUrl) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML=\'<span style=font-size:1rem;font-weight:700;color:var(--gold2)>' + initials + '</span>\'">'
+        : '<span style="font-size:1rem;font-weight:700;color:var(--gold2);">' + initials + '</span>';
+      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.2rem;text-align:center;">'
+        + '<div style="width:52px;height:52px;border-radius:50%;background:rgba(212,160,23,0.1);border:2px solid rgba(212,160,23,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 0.8rem;overflow:hidden;">'
+        + avHtml + '</div>'
+        + '<div style="font-weight:700;color:var(--text);font-size:0.9rem;">' + esc(m.nom) + '</div>'
+        + '<div style="font-size:0.75rem;color:var(--gold2);margin-top:3px;">⚔ Passeur</div>'
+        + (m.passages ? '<div style="font-size:0.72rem;color:var(--textd);margin-top:4px;">' + m.passages + ' passages</div>' : '')
+        + '</div>';
+    }).join('');
+  } catch(e) {}
+}
 
 /* ═════════════════════════════════
    STATS
