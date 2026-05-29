@@ -1,4 +1,41 @@
 <!DOCTYPE html>
+<!--
+  site.html — Passages Donjons Dofus (Serveur Hell Mina)
+  ════════════════════════════════════════════════════════
+  Site statique hébergé sur GitHub Pages (bloodshot-icare.github.io/dungeonpass/).
+  Toutes les données sont chargées dynamiquement depuis l'API Railway.
+
+  STRUCTURE :
+    <head>      → CSS, polices (Rajdhani, Cinzel, Exo2), variables
+    <body>
+      <nav>     → barre de navigation + menu mobile
+      #page-home     → page d'accueil Epic Landing (hero, stats, donjons vedettes, équipe)
+      .hero-banner   → bandeau affiché uniquement sur la page Donjons
+      .main-layout   → sidebar catégories + grille de donjons
+      #page-classement
+      #page-equipe
+      #page-profil
+      #page-admin    → interface d'administration complète
+    <script>    → logique JS : auth, navigation, API calls, admin CRUD
+
+  API :
+    Toutes les requêtes pointent vers la constante API définie en haut du script.
+    En local (localhost / 127.0.0.1 / file://) → http://localhost:3001
+    En production → https://bloodshot-icare-dofus-bot-passage-production.up.railway.app
+
+  AUTH :
+    JWT stocké dans localStorage (clé "dp_token").
+    OAuth Discord via /api/auth/discord → callback → redirect avec ?token=...
+
+  NAVIGATION :
+    showPage(page) gère l'affichage des sections et sauvegarde la page
+    courante dans localStorage (clé "dp_page") pour la restaurer au refresh.
+
+  AJOUT D'IMAGE DONJON :
+    1. Déposer le fichier PNG (1280×720) dans dungeonpass/assets/
+    2. Ajouter une entrée dans IMG_OVERRIDE si le nom normalisé ne correspond pas
+    3. Ajouter le nom du fichier dans le tableau ASSETS
+-->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
