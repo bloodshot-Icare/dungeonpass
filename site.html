@@ -1477,6 +1477,14 @@ footer a { color: var(--gold); text-decoration: none; }
         <div class="admin-stat-card"><div class="admin-stat-num">—</div><div class="admin-stat-label">⚔️ Passages</div></div>
         <div class="admin-stat-card"><div class="admin-stat-num">—</div><div class="admin-stat-label">👥 Joueurs</div></div>
       </div>
+      <div style="background:rgba(255,160,0,0.08);border:1px solid rgba(255,160,0,0.25);border-radius:var(--r2);padding:1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#f4a200;margin-bottom:0.5rem;">⚠️ Persistance des données</div>
+        <div style="font-size:0.82rem;color:var(--textm);margin-bottom:0.8rem;">Sur Railway, les modifications sont perdues au redéploiement. Exporte la config après chaque modification importante, puis réimporte-la si besoin.</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button class="admin-btn admin-btn-gold" onclick="adminExportConfig()">📥 Exporter la config</button>
+          <label class="admin-btn admin-btn-blue" style="cursor:pointer;">📤 Importer config <input type="file" accept=".json" style="display:none;" onchange="adminImportConfig(this)"></label>
+        </div>
+      </div>
       <div class="content-section-title" style="margin-top:0.5rem;"><h2>Derniers Passages</h2></div>
       <div id="adminDashPassages"><div style="text-align:center;padding:2rem;color:var(--textd);"><span class="spinner"></span></div></div>
     </div>
@@ -2410,6 +2418,40 @@ function adminShowAddOption() {
     });
 }
 
+// ── EXPORT / IMPORT CONFIG (persistance Railway) ─────────────────────────────
+
+async function adminExportConfig() {
+  try {
+    const r = await adminFetch('/api/admin/export-config');
+    if (!r.ok) { showToast('❌ Export échoué'); return; }
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'dungeonpass-config.json'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ Config exportée — garde ce fichier précieusement !');
+  } catch(e) { showToast('❌ Erreur : ' + e.message); }
+}
+
+async function adminImportConfig(input) {
+  const file = input.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const config = JSON.parse(text);
+    if (!confirm('Importer cette configuration ? Les données actuelles seront écrasées.')) return;
+    const r = await adminFetch('/api/admin/import-config', { method:'POST', body: JSON.stringify(config) });
+    if (r.ok) {
+      showToast('✅ Config importée ! Rechargement...');
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      const err = await r.json().catch(() => ({}));
+      showToast('❌ Import échoué : ' + (err.error || 'inconnue'));
+    }
+  } catch(e) { showToast('❌ Erreur : ' + e.message); }
+  input.value = '';
+}
+
 // ── RANGS ─────────────────────────────────────────────────────────────────────
 async function adminLoadRangs() {
   try {
@@ -2443,8 +2485,15 @@ async function adminSaveRang(id) {
   const couleur = parseInt(hexCol.replace('#',''), 16);
   try {
     const r = await adminFetch('/api/admin/ranks/' + id, { method:'PUT', body: JSON.stringify({ nom, seuil, couleur }) });
-    showToast(r.ok ? '✅ Rang mis à jour' : '❌ Erreur');
-  } catch(e) {}
+    if (r.ok) {
+      showToast('✅ Rang mis à jour (Discord synchronisé)');
+    } else {
+      const err = await r.json().catch(() => ({}));
+      showToast('❌ Erreur ' + r.status + ' : ' + (err.error || 'inconnue'));
+    }
+  } catch(e) {
+    showToast('❌ Erreur réseau : ' + e.message);
+  }
 }
 
 async function adminDeleteRang(id) {
