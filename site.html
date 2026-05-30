@@ -1742,10 +1742,19 @@ function showPage(page) {
 }
 
 // Restaurer la dernière page visitée (sauf admin/profil qui nécessitent une auth)
-const _savedPage = localStorage.getItem('dp_page');
-const _RESTORABLE = ['home','donjons','classement','equipe'];
-const _initialPage = _RESTORABLE.includes(_savedPage) ? _savedPage : 'home';
-showPage(_initialPage);
+// Restaurer la page + l'onglet admin après que TOUT le JS soit initialisé
+// setTimeout(0) garantit que adminCurrentTab et toutes les variables sont déclarées
+setTimeout(() => {
+  const savedPage = localStorage.getItem('dp_page') || 'home';
+  const savedTab  = localStorage.getItem('dp_admin_tab') || 'dashboard';
+  const RESTORABLE = ['home','donjons','classement','equipe','profil','admin'];
+  const page = RESTORABLE.includes(savedPage) ? savedPage : 'home';
+  showPage(page);
+  // Si on revient sur l'admin, restaurer aussi l'onglet actif
+  if (page === 'admin' && typeof adminTab === 'function') {
+    adminTab(savedTab);
+  }
+}, 0);
 
 /* ═════════════════════════════════
    DATA
@@ -2181,6 +2190,7 @@ let adminDonjonsData = [];
 
 function adminTab(tab) {
   adminCurrentTab = tab;
+  try { localStorage.setItem('dp_admin_tab', tab); } catch(_) {}
   const tabs = ['dashboard','donjons','options','rangs','joueurs','passages'];
   document.querySelectorAll('.admin-tab').forEach((btn, i) => btn.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
