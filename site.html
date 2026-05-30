@@ -42,6 +42,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Passages Donjons — Serveur HELL MINA</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#d4a017">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DungeonPass">
+<meta name="application-name" content="DungeonPass">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════
@@ -2065,6 +2073,15 @@ function toggleMenu() {
    INIT
 ═════════════════════════════════ */
 loadStats();
+
+// ── PWA : enregistrement du Service Worker ────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('✅ Service Worker enregistré :', reg.scope))
+      .catch(err => console.warn('⚠️ Service Worker :', err));
+  });
+}
 loadServices();
 loadTicker();
 

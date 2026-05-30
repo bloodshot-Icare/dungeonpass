@@ -1,0 +1,41 @@
+{
+  "name": "DungeonPass — Passages Donjons Dofus",
+  "short_name": "DungeonPass",
+  "description": "Service de passages donjons Dofus — Serveur Hell Mina. Réserve ton passage, suis ta fidélité et consulte l'almanax quotidien.",
+  "start_url": "/dungeonpass/site.html",
+  "scope": "/dungeonpass/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e1a",
+  "theme_color": "#d4a017",
+  "lang": "fr",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Voir les donjons",
+      "short_name": "Donjons",
+      "url": "/dungeonpass/site.html#donjons",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Almanax du jour",
+      "short_name": "Almanax",
+      "url": "/dungeonpass/site.html#home",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
