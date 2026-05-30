@@ -7,7 +7,7 @@
  *  - Si hors ligne : affiche la dernière version mise en cache
  */
 
-const CACHE_NAME   = 'dungeonpass-v1';
+const CACHE_NAME   = 'dungeonpass-v3';
 const CACHE_ASSETS = [
   '/dungeonpass/site.html',
   '/dungeonpass/manifest.json',
