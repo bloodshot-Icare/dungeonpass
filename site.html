@@ -2349,7 +2349,7 @@ async function adminLoadOptions() {
       + '<td><input class="admin-inline-input" type="number" value="' + o.prix + '" id="oprix_' + o.id + '" style="width:120px;"></td>'
       + '<td><span class="toggle-badge ' + (o.actif?'on':'off') + '" id="otoggle_' + o.id + '" onclick="adminToggleOption(' + o.id + ')">' + (o.actif?'✅ Actif':'⛔ Inactif') + '</span></td>'
       + '<td class="actions">'
-      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveOptionPrix(' + o.id + ')">💾 Prix</button>'
+      + '<button class="admin-btn admin-btn-gold" onclick="adminSaveOptionPrix(' + o.id + ')">💾 Save</button>'
       + '<button class="admin-btn admin-btn-blue" onclick="adminEditOptionNom(' + o.id + ',\'' + esc(o.nom).replace(/'/g,"\\'") + '\')">✏️ Nom</button>'
       + '<button class="admin-btn admin-btn-red" onclick="adminDeleteOption(' + o.id + ',\'' + esc(o.nom).replace(/'/g,"\\'") + '\')">🗑️</button>'
       + '</td>'
